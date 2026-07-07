@@ -1,11 +1,6 @@
 from __future__ import annotations
 
-from app.models.profile_document import (
-    DocumentType,
-    VerificationStatus,
-)
 from app.models.user import SystemRole
-from tests.e2e.helpers.e2e_user_factory import create_e2e_user
 
 
 def upload_profile_document(
@@ -94,21 +89,17 @@ def test_get_my_documents(
 def test_admin_can_list_documents(
     client,
     disposable_user,
+    admin_user,
 ):
     upload_profile_document(
         client,
         disposable_user["access_token"],
     )
 
-    admin = create_e2e_user(
-        client,
-        role=SystemRole.admin,
-    )
-
     response = client.get(
         "/profile-documents/admin",
         headers={
-            "Authorization": f"Bearer {admin['access_token']}",
+            "Authorization": f"Bearer {admin_user['access_token']}",
         },
     )
 
@@ -122,21 +113,17 @@ def test_admin_can_list_documents(
 def test_admin_can_move_document_to_review(
     client,
     disposable_user,
+    admin_user,
 ):
     document = upload_profile_document(
         client,
         disposable_user["access_token"],
     )
 
-    admin = create_e2e_user(
-        client,
-        role=SystemRole.admin,
-    )
-
     response = client.patch(
         f"/profile-documents/admin/{document['id']}/review",
         headers={
-            "Authorization": f"Bearer {admin['access_token']}",
+            "Authorization": f"Bearer {admin_user['access_token']}",
         },
     )
 
@@ -150,21 +137,17 @@ def test_admin_can_move_document_to_review(
 def test_admin_can_approve_document(
     client,
     disposable_user,
+    admin_user,
 ):
     document = upload_profile_document(
         client,
         disposable_user["access_token"],
     )
 
-    admin = create_e2e_user(
-        client,
-        role=SystemRole.admin,
-    )
-
     review_response = client.patch(
         f"/profile-documents/admin/{document['id']}/review",
         headers={
-            "Authorization": f"Bearer {admin['access_token']}",
+            "Authorization": f"Bearer {admin_user['access_token']}",
         },
     )
 
@@ -173,7 +156,7 @@ def test_admin_can_approve_document(
     response = client.patch(
         f"/profile-documents/admin/{document['id']}/approve",
         headers={
-            "Authorization": f"Bearer {admin['access_token']}",
+            "Authorization": f"Bearer {admin_user['access_token']}",
         },
     )
 
@@ -189,28 +172,24 @@ def test_admin_can_approve_document(
 def test_admin_cannot_approve_already_approved_document(
     client,
     disposable_user,
+    admin_user,
 ):
     document = upload_profile_document(
         client,
         disposable_user["access_token"],
     )
 
-    admin = create_e2e_user(
-        client,
-        role=SystemRole.admin,
-    )
-
     client.patch(
         f"/profile-documents/admin/{document['id']}/approve",
         headers={
-            "Authorization": f"Bearer {admin['access_token']}",
+            "Authorization": f"Bearer {admin_user['access_token']}",
         },
     )
 
     response = client.patch(
         f"/profile-documents/admin/{document['id']}/approve",
         headers={
-            "Authorization": f"Bearer {admin['access_token']}",
+            "Authorization": f"Bearer {admin_user['access_token']}",
         },
     )
 
@@ -221,21 +200,17 @@ def test_admin_cannot_approve_already_approved_document(
 def test_admin_can_reject_document(
     client,
     disposable_user,
+    admin_user,
 ):
     document = upload_profile_document(
         client,
         disposable_user["access_token"],
     )
 
-    admin = create_e2e_user(
-        client,
-        role=SystemRole.admin,
-    )
-
     response = client.patch(
         f"/profile-documents/admin/{document['id']}/reject",
         headers={
-            "Authorization": f"Bearer {admin['access_token']}",
+            "Authorization": f"Bearer {admin_user['access_token']}",
         },
     )
 

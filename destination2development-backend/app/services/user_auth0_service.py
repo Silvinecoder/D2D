@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import urllib.parse
+
 import httpx
 
 from app.core.config import settings
@@ -21,9 +23,6 @@ class Auth0Service:
                     "audience": settings.AUTH0_MANAGEMENT_AUDIENCE,
                 },
             )
-
-        print(response.status_code)
-        print(response.text)
 
         response.raise_for_status()
 
@@ -144,11 +143,16 @@ class Auth0Service:
     def delete_user(
         self,
         auth0_id: str,
-    ):
+    ) -> None:
+
+        encoded_auth0_id = urllib.parse.quote(
+            auth0_id,
+            safe="",
+        )
 
         with httpx.Client(timeout=10) as client:
             response = client.delete(
-                f"https://{settings.AUTH0_DOMAIN}/api/v2/users/{auth0_id}",
+                f"https://{settings.AUTH0_DOMAIN}/api/v2/users/{encoded_auth0_id}",
                 headers=self._management_headers(),
             )
 

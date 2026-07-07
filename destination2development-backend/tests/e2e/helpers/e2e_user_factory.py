@@ -53,7 +53,6 @@ def create_e2e_user(
         if user is None:
             raise RuntimeError("Failed to provision local user.")
 
-        # Use the service layer instead of mutating directly.
         service.set_role(user.id, role)
 
         session.commit()
@@ -65,8 +64,7 @@ def create_e2e_user(
         session.close()
 
     def cleanup():
-        auth0.delete_user(auth0_user.auth0_id)
-
+        # Delete local DB user first
         session = SessionLocal()
 
         try:
@@ -78,8 +76,19 @@ def create_e2e_user(
                 service.permanently_delete_user(user.id)
                 session.commit()
 
+        except Exception as e:
+            session.rollback()
+            print(f"DB DELETE FAILED: {e}")
+
         finally:
             session.close()
+
+        # Delete Auth0 user second
+        try:
+            auth0.delete_user(auth0_user.auth0_id)
+
+        except Exception as e:
+            print(f"AUTH0 DELETE FAILED: {e}")
 
     return {
         "auth0_id": auth0_user.auth0_id,

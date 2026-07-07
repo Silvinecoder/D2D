@@ -102,7 +102,7 @@ class User(Base, TimestampMixin):
         foreign_keys="ProfileDocument.user_id",
         cascade="all, delete-orphan",
     )
-    
+
     verified_documents: Mapped[list[ProfileDocument]] = relationship(
         "ProfileDocument",
         back_populates="verifier",
