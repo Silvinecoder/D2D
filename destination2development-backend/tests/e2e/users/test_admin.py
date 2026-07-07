@@ -146,9 +146,7 @@ def test_process_scheduled_deletions_admin(client, admin_user, disposable_user):
 
         user = service.get_by_id(target_user_id)
 
-        user.scheduled_deletion_at = (
-            datetime.now(UTC) - timedelta(minutes=1)
-        )
+        user.scheduled_deletion_at = datetime.now(UTC) - timedelta(minutes=1)
 
         session.commit()
 
@@ -166,10 +164,7 @@ def test_process_scheduled_deletions_admin(client, admin_user, disposable_user):
 
     deleted = response.json()
 
-    assert any(
-        user["id"] == str(target_user_id)
-        for user in deleted
-    )
+    assert any(user["id"] == str(target_user_id) for user in deleted)
 
     response = client.get(
         f"/users/admin/{target_user_id}",

@@ -20,13 +20,11 @@ class UnlockRequestNotFoundError(Exception):
 
 
 class UserUnlockRequestService:
-
     def __init__(
         self,
         session: Session,
     ):
         self.session = session
-
 
     def get_by_id(
         self,
@@ -37,7 +35,6 @@ class UserUnlockRequestService:
             UserUnlockRequest,
             request_id,
         )
-
 
     def get_by_id_or_raise(
         self,
@@ -50,7 +47,6 @@ class UserUnlockRequestService:
             raise UnlockRequestNotFoundError()
 
         return request
-
 
     def create_request(
         self,
@@ -77,7 +73,6 @@ class UserUnlockRequestService:
 
         return request
 
-
     def get_pending_requests(
         self,
     ) -> list[UserUnlockRequest]:
@@ -92,7 +87,6 @@ class UserUnlockRequestService:
 
         return list(self.session.scalars(stmt))
 
-
     def approve_request(
         self,
         request_id: uuid.UUID,
@@ -106,7 +100,6 @@ class UserUnlockRequestService:
         request.user.account_status = AccountStatus.active
 
         return request
-
 
     def reject_request(
         self,

@@ -9,14 +9,12 @@ def run():
     session = SessionLocal()
 
     try:
-
         auth0 = Auth0Service()
         users = UserService(session)
 
         expired = users.get_users_ready_for_deletion()
 
         for user in expired:
-
             auth0.delete_user(
                 user.auth0_id,
             )
@@ -28,7 +26,6 @@ def run():
         session.commit()
 
     finally:
-
         session.close()
 
 

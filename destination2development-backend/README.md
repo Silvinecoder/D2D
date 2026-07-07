@@ -110,6 +110,10 @@ The database stores application-specific information such as:
 For a complete local development reset:
 
 ```bash
+cd destination2development-backend
+
+source .venv/bin/activate
+
 docker compose down -v --remove-orphans
 
 find . -type d -name "__pycache__" -prune -exec rm -rf {} +
@@ -145,6 +149,16 @@ Format the codebase using Ruff:
 ```bash
 uv run ruff format
 ```
+
+## Tests
+
+Command to run e2e tests:
+
+```bash
+pytest tests/e2e
+
+```
+
 
 ---
 

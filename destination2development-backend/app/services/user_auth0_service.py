@@ -7,20 +7,18 @@ from app.schemas.user_auth0 import Auth0User
 
 
 class Auth0Service:
-
     def get_management_token(
         self,
     ) -> str:
 
         with httpx.Client(timeout=10) as client:
-
             response = client.post(
                 f"https://{settings.AUTH0_DOMAIN}/oauth/token",
                 json={
                     "grant_type": settings.AUTH0_GRANT_TYPE,
                     "client_id": settings.AUTH0_CLIENT_ID,
                     "client_secret": settings.AUTH0_CLIENT_SECRET,
-                    "audience": settings.AUTH0_MANAGEMENT_AUDIENCE
+                    "audience": settings.AUTH0_MANAGEMENT_AUDIENCE,
                 },
             )
 
@@ -45,7 +43,6 @@ class Auth0Service:
     ) -> Auth0User:
 
         with httpx.Client(timeout=10) as client:
-
             response = client.get(
                 f"https://{settings.AUTH0_DOMAIN}/userinfo",
                 headers={
@@ -71,7 +68,6 @@ class Auth0Service:
     ) -> Auth0User:
 
         with httpx.Client(timeout=10) as client:
-
             response = client.post(
                 f"https://{settings.AUTH0_DOMAIN}/api/v2/users",
                 headers=self._management_headers(),
@@ -100,7 +96,6 @@ class Auth0Service:
     ):
 
         with httpx.Client(timeout=10) as client:
-
             response = client.patch(
                 f"https://{settings.AUTH0_DOMAIN}/api/v2/users/{auth0_id}",
                 headers=self._management_headers(),
@@ -118,7 +113,6 @@ class Auth0Service:
     ):
 
         with httpx.Client(timeout=10) as client:
-
             response = client.patch(
                 f"https://{settings.AUTH0_DOMAIN}/api/v2/users/{auth0_id}",
                 headers=self._management_headers(),
@@ -137,7 +131,6 @@ class Auth0Service:
     ):
 
         with httpx.Client(timeout=10) as client:
-
             response = client.patch(
                 f"https://{settings.AUTH0_DOMAIN}/api/v2/users/{auth0_id}",
                 headers=self._management_headers(),
@@ -154,7 +147,6 @@ class Auth0Service:
     ):
 
         with httpx.Client(timeout=10) as client:
-
             response = client.delete(
                 f"https://{settings.AUTH0_DOMAIN}/api/v2/users/{auth0_id}",
                 headers=self._management_headers(),

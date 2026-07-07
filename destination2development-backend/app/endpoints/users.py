@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import uuid
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.core.dependencies import (
@@ -20,7 +20,10 @@ from app.schemas.user import (
     UserRoleUpdate,
 )
 from app.services.user_auth0_service import Auth0Service
-from app.services.user_service import UserService
+from app.services.user_service import (
+    UserNotFoundError,
+    UserService,
+)
 
 
 router = APIRouter(
@@ -33,6 +36,7 @@ auth0 = Auth0Service()
 
 # CURRENT USER
 
+
 @router.get(
     "/current",
     response_model=UserResponse,
@@ -41,8 +45,9 @@ def get_current_user_details(
     user: User = Depends(get_current_user),
     session: Session = Depends(get_db),
 ):
-    # get_current_user may have just bumped last_login_at
+    # get_current_user may have just bumped last_login_at.
     session.commit()
+
     return user
 
 
@@ -55,12 +60,23 @@ def update_current_user_name(
     user: User = Depends(get_current_active_user),
     session: Session = Depends(get_db),
 ):
-    auth0.update_name(user.auth0_id, data.name)
+    try:
+        auth0.update_name(user.auth0_id, data.name)
 
-    user = UserService(session).update_user_name(user.id, data.name)
-    session.commit()
+        user = UserService(session).update_user_name(
+            user.id,
+            data.name,
+        )
 
-    return user
+        session.commit()
+
+        return user
+
+    except UserNotFoundError:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found.",
+        )
 
 
 @router.patch(
@@ -72,12 +88,23 @@ def update_current_user_email(
     user: User = Depends(get_current_active_user),
     session: Session = Depends(get_db),
 ):
-    auth0.update_email(user.auth0_id, data.email)
+    try:
+        auth0.update_email(user.auth0_id, data.email)
 
-    user = UserService(session).update_user_email(user.id, data.email)
-    session.commit()
+        user = UserService(session).update_user_email(
+            user.id,
+            data.email,
+        )
 
-    return user
+        session.commit()
+
+        return user
+
+    except UserNotFoundError:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found.",
+        )
 
 
 @router.patch(
@@ -102,13 +129,22 @@ def delete_current_user(
     user: User = Depends(get_current_user),
     session: Session = Depends(get_db),
 ):
-    user = UserService(session).schedule_deletion(user.id)
-    session.commit()
+    try:
+        user = UserService(session).schedule_deletion(user.id)
 
-    return user
+        session.commit()
+
+        return user
+
+    except UserNotFoundError:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found.",
+        )
 
 
 # ADMIN
+
 
 @router.get(
     "/admin",
@@ -130,7 +166,14 @@ def get_user(
     session: Session = Depends(get_db),
     _admin: User = Depends(require_admin),
 ):
-    return UserService(session).get_by_id(user_id)
+    try:
+        return UserService(session).get_by_id(user_id)
+
+    except UserNotFoundError:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found.",
+        )
 
 
 @router.patch(
@@ -143,10 +186,21 @@ def update_user_role(
     session: Session = Depends(get_db),
     _admin: User = Depends(require_admin),
 ):
-    user = UserService(session).set_role(user_id, data.system_role)
-    session.commit()
+    try:
+        user = UserService(session).set_role(
+            user_id,
+            data.system_role,
+        )
 
-    return user
+        session.commit()
+
+        return user
+
+    except UserNotFoundError:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found.",
+        )
 
 
 @router.patch(
@@ -158,10 +212,18 @@ def lock_user(
     session: Session = Depends(get_db),
     _admin: User = Depends(require_admin),
 ):
-    user = UserService(session).lock_user(user_id)
-    session.commit()
+    try:
+        user = UserService(session).lock_user(user_id)
 
-    return user
+        session.commit()
+
+        return user
+
+    except UserNotFoundError:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found.",
+        )
 
 
 @router.patch(
@@ -173,10 +235,18 @@ def deactivate_user(
     session: Session = Depends(get_db),
     _admin: User = Depends(require_admin),
 ):
-    user = UserService(session).schedule_deletion(user_id)
-    session.commit()
+    try:
+        user = UserService(session).schedule_deletion(user_id)
 
-    return user
+        session.commit()
+
+        return user
+
+    except UserNotFoundError:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found.",
+        )
 
 
 @router.patch(
@@ -188,10 +258,18 @@ def restore_user(
     session: Session = Depends(get_db),
     _admin: User = Depends(require_admin),
 ):
-    user = UserService(session).restore_user(user_id)
-    session.commit()
+    try:
+        user = UserService(session).restore_user(user_id)
 
-    return user
+        session.commit()
+
+        return user
+
+    except UserNotFoundError:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found.",
+        )
 
 
 @router.post(
@@ -211,8 +289,13 @@ def process_scheduled_deletions(
     to serialize afterward.
     """
     service = UserService(session)
+
     users = service.get_users_ready_for_deletion()
-    deleted = [UserResponse.model_validate(user) for user in users]
+
+    deleted = [
+        UserResponse.model_validate(user)
+        for user in users
+    ]
 
     for user in users:
         service.permanently_delete_user(user.id)

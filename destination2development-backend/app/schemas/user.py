@@ -21,7 +21,7 @@ class UserResponse(BaseModel):
 
     last_login_at: datetime | None
 
-    deactivated_at: datetime |None
+    deactivated_at: datetime | None
     scheduled_deletion_at: datetime | None
     deleted_at: datetime | None
 

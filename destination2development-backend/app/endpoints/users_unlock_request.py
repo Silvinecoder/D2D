@@ -28,6 +28,7 @@ router = APIRouter(
 
 # USER CREATES REQUEST
 
+
 @router.post(
     "",
     response_model=UnlockRequestResponse,
@@ -48,6 +49,7 @@ def create_unlock_request(
 
 # ADMIN LISTS REQUESTS
 
+
 @router.get(
     "/admin",
     response_model=list[UnlockRequestResponse],
@@ -60,6 +62,7 @@ def list_unlock_requests(
 
 
 # ADMIN APPROVES
+
 
 @router.patch(
     "/admin/{request_id}/approve",
@@ -79,6 +82,7 @@ def approve_unlock_request(
 
 
 # ADMIN REJECTS
+
 
 @router.patch(
     "/admin/{request_id}/reject",
