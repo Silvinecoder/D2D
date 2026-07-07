@@ -96,12 +96,13 @@ class User(Base, TimestampMixin):
         single_parent=True,
     )
 
-    profile_documents: Mapped[list[ProfileDocument]] = relationship(
+    profile_documents: Mapped[list["ProfileDocument"]] = relationship(
         "ProfileDocument",
         back_populates="user",
         foreign_keys="ProfileDocument.user_id",
+        cascade="all, delete-orphan",
     )
-
+    
     verified_documents: Mapped[list[ProfileDocument]] = relationship(
         "ProfileDocument",
         back_populates="verifier",
