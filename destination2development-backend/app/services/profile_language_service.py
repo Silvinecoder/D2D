@@ -5,18 +5,15 @@ import uuid
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.models.profile_language import ProfileLanguage, LanguageType
-from app.models.profile import Profile
 from app.models.language import Language
-
-
-class ProfileNotFoundError(Exception):
-    pass
+from app.models.profile_language import (
+    LanguageType,
+    ProfileLanguage,
+)
 
 
 class LanguageNotFoundError(Exception):
     pass
-
 
 class ProfileLanguageService:
     def __init__(self, session: Session):
@@ -28,15 +25,8 @@ class ProfileLanguageService:
         language_id: uuid.UUID,
         language_type: LanguageType,
     ) -> ProfileLanguage:
-
-        profile = self.session.get(Profile, profile_id)
-
-        if not profile:
-            raise ProfileNotFoundError()
-
         language = self.session.get(Language, language_id)
-
-        if not language:
+        if language is None:
             raise LanguageNotFoundError()
 
         stmt = select(ProfileLanguage).where(
@@ -44,9 +34,7 @@ class ProfileLanguageService:
             ProfileLanguage.language_id == language_id,
             ProfileLanguage.type == language_type,
         )
-
-        existing = self.session.execute(stmt).scalar_one_or_none()
-
+        existing = self.session.scalar(stmt)
         if existing:
             return existing
 
@@ -55,9 +43,7 @@ class ProfileLanguageService:
             language_id=language_id,
             type=language_type,
         )
-
         self.session.add(profile_language)
-
         return profile_language
 
     def remove_language(
@@ -66,15 +52,12 @@ class ProfileLanguageService:
         language_id: uuid.UUID,
         language_type: LanguageType,
     ) -> None:
-
         stmt = select(ProfileLanguage).where(
             ProfileLanguage.profile_id == profile_id,
             ProfileLanguage.language_id == language_id,
             ProfileLanguage.type == language_type,
         )
-
-        profile_language = self.session.execute(stmt).scalar_one_or_none()
-
+        profile_language = self.session.scalar(stmt)
         if profile_language:
             self.session.delete(profile_language)
 
@@ -82,22 +65,18 @@ class ProfileLanguageService:
         self,
         profile_id: uuid.UUID,
     ) -> list[ProfileLanguage]:
-
         stmt = select(ProfileLanguage).where(
             ProfileLanguage.profile_id == profile_id,
         )
-
-        return list(self.session.execute(stmt).scalars().all())
+        return list(self.session.scalars(stmt))
 
     def get_by_type(
         self,
         profile_id: uuid.UUID,
         language_type: LanguageType,
     ) -> list[ProfileLanguage]:
-
         stmt = select(ProfileLanguage).where(
             ProfileLanguage.profile_id == profile_id,
             ProfileLanguage.type == language_type,
         )
-
-        return list(self.session.execute(stmt).scalars().all())
+        return list(self.session.scalars(stmt))

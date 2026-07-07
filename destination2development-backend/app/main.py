@@ -3,6 +3,7 @@ from fastapi import FastAPI
 import app.models
 
 from app.endpoints import (
+    profile_languages,
     languages,
     documents_access_request,
     profile_documents,
@@ -21,6 +22,7 @@ app.include_router(profiles.router)
 app.include_router(profile_documents.router)
 app.include_router(documents_access_request.router)
 app.include_router(languages.router)
+app.include_router(profile_languages.router)
 
 
 @app.get("/")

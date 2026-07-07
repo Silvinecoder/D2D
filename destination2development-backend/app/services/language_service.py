@@ -56,6 +56,4 @@ class LanguageService:
             Language.name,
         )
 
-        return list(
-            self.session.scalars(stmt)
-        )
+        return list(self.session.scalars(stmt))

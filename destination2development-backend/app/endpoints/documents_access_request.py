@@ -148,6 +148,7 @@ def reject_document_access_request(
 
 # USER VIEW OWN REQUEST
 
+
 @router.get(
     "/{request_id}",
     response_model=DocumentAccessRequestResponse,

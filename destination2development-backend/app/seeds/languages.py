@@ -30,9 +30,7 @@ def seed_languages():
         service = LanguageService(session)
 
         for item in DEFAULT_LANGUAGES:
-            existing = service.get_by_code(
-                item["code"]
-            )
+            existing = service.get_by_code(item["code"])
 
             if existing:
                 continue
