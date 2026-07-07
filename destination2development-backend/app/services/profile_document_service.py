@@ -66,17 +66,23 @@ class ProfileDocumentService(CRUDService[ProfileDocument]):
 
         return document
 
-    def approve_document(self, document_id: uuid.UUID, reviewer: User) -> ProfileDocument:
+    def approve_document(
+        self, document_id: uuid.UUID, reviewer: User
+    ) -> ProfileDocument:
         document = self._transition_reviewable(document_id, reviewer)
         document.verification_status = VerificationStatus.approved
         return document
 
-    def reject_document(self, document_id: uuid.UUID, reviewer: User) -> ProfileDocument:
+    def reject_document(
+        self, document_id: uuid.UUID, reviewer: User
+    ) -> ProfileDocument:
         document = self._transition_reviewable(document_id, reviewer)
         document.verification_status = VerificationStatus.rejected
         return document
 
-    def _transition_reviewable(self, document_id: uuid.UUID, reviewer: User) -> ProfileDocument:
+    def _transition_reviewable(
+        self, document_id: uuid.UUID, reviewer: User
+    ) -> ProfileDocument:
         document = self.get_by_id_or_raise(document_id)
 
         if document.verification_status not in {

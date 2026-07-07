@@ -17,6 +17,10 @@ if TYPE_CHECKING:
     from .profile import Profile
     from .profile_document import ProfileDocument
     from .user_unlock_request import UserUnlockRequest
+    from .message import Message
+    from .message_thread import MessageThread
+    from .message_thread_participant import MessageThreadParticipant
+    from .notification import Notification
 
 
 class AccountStatus(str, enum.Enum):
@@ -109,7 +113,7 @@ class User(Base, TimestampMixin):
         foreign_keys="ProfileDocument.verified_by",
     )
 
-    document_access_requests: Mapped[list[DocumentAccessRequest]] = relationship(
+    document_access_requests_requests: Mapped[list[DocumentAccessRequest]] = relationship(
         "DocumentAccessRequest",
         back_populates="user",
         foreign_keys="DocumentAccessRequest.user_id",
@@ -125,6 +129,28 @@ class User(Base, TimestampMixin):
 
     unlock_requests: Mapped[list[UserUnlockRequest]] = relationship(
         "UserUnlockRequest",
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
+
+    messages: Mapped[list["Message"]] = relationship(
+        "Message",
+        back_populates="sender",
+    )
+
+    thread_participations: Mapped[list["MessageThreadParticipant"]] = relationship(
+        "MessageThreadParticipant",
+        back_populates="user",
+    )
+
+    created_message_threads: Mapped[list["MessageThread"]] = relationship(
+        "MessageThread",
+        foreign_keys="MessageThread.created_by",
+        back_populates="creator",
+    )
+
+    notifications: Mapped[list["Notification"]] = relationship(
+        "Notification",
         back_populates="user",
         cascade="all, delete-orphan",
     )

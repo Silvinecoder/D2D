@@ -29,7 +29,9 @@ class DocumentAccessRequestService(CRUDService[DocumentAccessRequest]):
     model = DocumentAccessRequest
     not_found_error = AccessRequestNotFoundError
 
-    def create_request(self, user: User, reason: str | None = None) -> DocumentAccessRequest:
+    def create_request(
+        self, user: User, reason: str | None = None
+    ) -> DocumentAccessRequest:
         stmt = select(DocumentAccessRequest).where(
             DocumentAccessRequest.user_id == user.id,
             DocumentAccessRequest.status == Status.pending,
@@ -49,10 +51,14 @@ class DocumentAccessRequestService(CRUDService[DocumentAccessRequest]):
 
         return request
 
-    def approve_request(self, request_id: uuid.UUID, reviewer: User) -> DocumentAccessRequest:
+    def approve_request(
+        self, request_id: uuid.UUID, reviewer: User
+    ) -> DocumentAccessRequest:
         return self._resolve_request(request_id, reviewer, Status.approved)
 
-    def reject_request(self, request_id: uuid.UUID, reviewer: User) -> DocumentAccessRequest:
+    def reject_request(
+        self, request_id: uuid.UUID, reviewer: User
+    ) -> DocumentAccessRequest:
         return self._resolve_request(request_id, reviewer, Status.rejected)
 
     def _resolve_request(
@@ -72,7 +78,9 @@ class DocumentAccessRequestService(CRUDService[DocumentAccessRequest]):
 
         return request
 
-    def list_requests(self, status: Status | None = None) -> list[DocumentAccessRequest]:
+    def list_requests(
+        self, status: Status | None = None
+    ) -> list[DocumentAccessRequest]:
         stmt = select(DocumentAccessRequest)
 
         if status is not None:
