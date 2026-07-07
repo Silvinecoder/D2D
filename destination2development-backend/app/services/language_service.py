@@ -12,18 +12,26 @@ class LanguageNotFoundError(Exception):
     pass
 
 
-class LanguageAlreadyExistsError(Exception):
-    pass
-
-
 class LanguageService:
-    def __init__(self, session: Session):
+    def __init__(
+        self,
+        session: Session,
+    ):
         self.session = session
 
-    def get_by_id(self, language_id: uuid.UUID) -> Language | None:
-        return self.session.get(Language, language_id)
+    def get_by_id(
+        self,
+        language_id: uuid.UUID,
+    ) -> Language | None:
+        return self.session.get(
+            Language,
+            language_id,
+        )
 
-    def get_by_id_or_raise(self, language_id: uuid.UUID) -> Language:
+    def get_by_id_or_raise(
+        self,
+        language_id: uuid.UUID,
+    ) -> Language:
         language = self.get_by_id(language_id)
 
         if language is None:
@@ -31,34 +39,23 @@ class LanguageService:
 
         return language
 
-    def get_by_code(self, code: str) -> Language | None:
-        stmt = select(Language).where(Language.code == code)
-
-        return self.session.execute(stmt).scalar_one_or_none()
-
-    def create_language(
+    def get_by_code(
         self,
         code: str,
-        name: str,
-    ) -> Language:
-
-        normalized_code = code.lower().strip()
-
-        existing = self.get_by_code(normalized_code)
-
-        if existing:
-            raise LanguageAlreadyExistsError()
-
-        language = Language(
-            code=normalized_code,
-            name=name,
+    ) -> Language | None:
+        stmt = select(Language).where(
+            Language.code == code.lower().strip(),
         )
 
-        self.session.add(language)
+        return self.session.scalar(stmt)
 
-        return language
+    def list_languages(
+        self,
+    ) -> list[Language]:
+        stmt = select(Language).order_by(
+            Language.name,
+        )
 
-    def list_languages(self) -> list[Language]:
-        stmt = select(Language).order_by(Language.name)
-
-        return list(self.session.execute(stmt).scalars().all())
+        return list(
+            self.session.scalars(stmt)
+        )

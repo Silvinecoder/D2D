@@ -15,17 +15,15 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+
     env_file:
       - .env
+
     environment:
       DB_HOST: db
-      DB_USER: postgres
-      DB_PASSWORD: postgres
-      DB_NAME: destination2development
+
     depends_on:
       - db
-    ports:
-      - "8000:8000"
 
 volumes:
   postgres_data:
