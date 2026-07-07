@@ -292,10 +292,7 @@ def process_scheduled_deletions(
 
     users = service.get_users_ready_for_deletion()
 
-    deleted = [
-        UserResponse.model_validate(user)
-        for user in users
-    ]
+    deleted = [UserResponse.model_validate(user) for user in users]
 
     for user in users:
         service.permanently_delete_user(user.id)

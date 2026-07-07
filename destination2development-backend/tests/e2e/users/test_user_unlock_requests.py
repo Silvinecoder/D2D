@@ -111,8 +111,7 @@ def test_list_unlock_requests_admin(
     assert isinstance(requests, list)
 
     assert any(
-        request["user_id"] == str(disposable_user["user_id"])
-        for request in requests
+        request["user_id"] == str(disposable_user["user_id"]) for request in requests
     )
 
 

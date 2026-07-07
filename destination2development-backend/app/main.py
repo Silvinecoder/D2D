@@ -2,8 +2,11 @@ from fastapi import FastAPI
 
 import app.models
 
-from app.endpoints import users, users_unlock_request
-
+from app.endpoints import (
+    profiles,
+    users,
+    users_unlock_request,
+)
 
 app = FastAPI(
     title="Destination2Development API",
@@ -11,6 +14,7 @@ app = FastAPI(
 
 app.include_router(users.router)
 app.include_router(users_unlock_request.router)
+app.include_router(profiles.router)
 
 
 @app.get("/")

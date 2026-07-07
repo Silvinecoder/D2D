@@ -168,13 +168,3 @@ pytest tests/e2e
 * Docker manages application and database containers.
 * Alembic manages database schema changes.
 * `__pycache__` directories and `.pyc` files are generated Python bytecode and should not be committed to version control.
-
-This version is easier for a new developer joining the project because the reading order becomes:
-
-1. **What is this project?**
-2. **Where is everything?**
-3. **How does the backend work?**
-4. **How does authentication work?**
-5. **How do I run/reset/develop it?**
-
-I would also avoid putting `Format Document` in the README — that looks like an editor command that accidentally got copied in.

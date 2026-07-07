@@ -88,10 +88,12 @@ class User(Base, TimestampMixin):
         nullable=True,
     )
 
-    profile: Mapped[Profile | None] = relationship(
+    profile: Mapped["Profile | None"] = relationship(
         "Profile",
         back_populates="user",
         uselist=False,
+        cascade="all, delete-orphan",
+        single_parent=True,
     )
 
     profile_documents: Mapped[list[ProfileDocument]] = relationship(

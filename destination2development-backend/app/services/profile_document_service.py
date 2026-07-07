@@ -11,7 +11,7 @@ from app.models.profile_document import (
     DocumentType,
     VerificationStatus,
 )
-from models.user import User
+from app.models.user import User
 
 
 class DocumentNotFoundError(Exception):
