@@ -9,10 +9,7 @@ from app.schemas.user_auth0 import Auth0User
 
 
 class Auth0Service:
-    def get_management_token(
-        self,
-    ) -> str:
-
+    def get_management_token(self) -> str:
         with httpx.Client(timeout=10) as client:
             response = client.post(
                 f"https://{settings.AUTH0_DOMAIN}/oauth/token",
@@ -28,19 +25,12 @@ class Auth0Service:
 
         return response.json()["access_token"]
 
-    def _management_headers(
-        self,
-    ) -> dict[str, str]:
-
+    def _management_headers(self) -> dict[str, str]:
         return {
             "Authorization": f"Bearer {self.get_management_token()}",
         }
 
-    def get_user(
-        self,
-        access_token: str,
-    ) -> Auth0User:
-
+    def get_user(self, access_token: str) -> Auth0User:
         with httpx.Client(timeout=10) as client:
             response = client.get(
                 f"https://{settings.AUTH0_DOMAIN}/userinfo",
@@ -59,13 +49,7 @@ class Auth0Service:
             name=data.get("name"),
         )
 
-    def create_user(
-        self,
-        email: str,
-        password: str,
-        name: str,
-    ) -> Auth0User:
-
+    def create_user(self, email: str, password: str, name: str) -> Auth0User:
         with httpx.Client(timeout=10) as client:
             response = client.post(
                 f"https://{settings.AUTH0_DOMAIN}/api/v2/users",
@@ -88,67 +72,33 @@ class Auth0Service:
             name=data.get("name"),
         )
 
-    def update_email(
-        self,
-        auth0_id: str,
-        email: str,
-    ):
-
+    def _patch_user(self, auth0_id: str, payload: dict) -> None:
         with httpx.Client(timeout=10) as client:
             response = client.patch(
                 f"https://{settings.AUTH0_DOMAIN}/api/v2/users/{auth0_id}",
                 headers=self._management_headers(),
-                json={
-                    "email": email,
-                },
+                json=payload,
             )
 
         response.raise_for_status()
 
-    def update_password(
-        self,
-        auth0_id: str,
-        password: str,
-    ):
+    def update_email(self, auth0_id: str, email: str) -> None:
+        self._patch_user(auth0_id, {"email": email})
 
-        with httpx.Client(timeout=10) as client:
-            response = client.patch(
-                f"https://{settings.AUTH0_DOMAIN}/api/v2/users/{auth0_id}",
-                headers=self._management_headers(),
-                json={
-                    "password": password,
-                    "connection": "Username-Password-Authentication",
-                },
-            )
-
-        response.raise_for_status()
-
-    def update_name(
-        self,
-        auth0_id: str,
-        name: str,
-    ):
-
-        with httpx.Client(timeout=10) as client:
-            response = client.patch(
-                f"https://{settings.AUTH0_DOMAIN}/api/v2/users/{auth0_id}",
-                headers=self._management_headers(),
-                json={
-                    "name": name,
-                },
-            )
-
-        response.raise_for_status()
-
-    def delete_user(
-        self,
-        auth0_id: str,
-    ) -> None:
-
-        encoded_auth0_id = urllib.parse.quote(
+    def update_password(self, auth0_id: str, password: str) -> None:
+        self._patch_user(
             auth0_id,
-            safe="",
+            {
+                "password": password,
+                "connection": "Username-Password-Authentication",
+            },
         )
+
+    def update_name(self, auth0_id: str, name: str) -> None:
+        self._patch_user(auth0_id, {"name": name})
+
+    def delete_user(self, auth0_id: str) -> None:
+        encoded_auth0_id = urllib.parse.quote(auth0_id, safe="")
 
         with httpx.Client(timeout=10) as client:
             response = client.delete(

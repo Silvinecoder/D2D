@@ -15,6 +15,7 @@ from app.models.profile_language import (
 class LanguageNotFoundError(Exception):
     pass
 
+
 class ProfileLanguageService:
     def __init__(self, session: Session):
         self.session = session
@@ -61,10 +62,7 @@ class ProfileLanguageService:
         if profile_language:
             self.session.delete(profile_language)
 
-    def get_profile_languages(
-        self,
-        profile_id: uuid.UUID,
-    ) -> list[ProfileLanguage]:
+    def get_profile_languages(self, profile_id: uuid.UUID) -> list[ProfileLanguage]:
         stmt = select(ProfileLanguage).where(
             ProfileLanguage.profile_id == profile_id,
         )

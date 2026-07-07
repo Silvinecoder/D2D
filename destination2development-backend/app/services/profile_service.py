@@ -42,7 +42,6 @@ class ProfileService:
         city: str | None = None,
         education_level: str | None = None,
     ) -> Profile:
-
         existing = self.get_by_user_id(user.id)
 
         if existing:
@@ -59,9 +58,7 @@ class ProfileService:
 
         if avatar_document_id is not None:
             try:
-                document = ProfileDocumentService(
-                    self.session,
-                ).get_by_id_or_raise(
+                document = ProfileDocumentService(self.session).get_by_id_or_raise(
                     avatar_document_id,
                 )
             except DocumentNotFoundError:
@@ -80,22 +77,11 @@ class ProfileService:
 
         return profile
 
-    def get_by_user_id(
-        self,
-        user_id: uuid.UUID,
-    ) -> Profile | None:
-
-        stmt = select(Profile).where(
-            Profile.user_id == user_id,
-        )
-
+    def get_by_user_id(self, user_id: uuid.UUID) -> Profile | None:
+        stmt = select(Profile).where(Profile.user_id == user_id)
         return self.session.execute(stmt).scalar_one_or_none()
 
-    def get_profile_or_raise(
-        self,
-        user_id: uuid.UUID,
-    ) -> Profile:
-
+    def get_profile_or_raise(self, user_id: uuid.UUID) -> Profile:
         profile = self.get_by_user_id(user_id)
 
         if profile is None:
@@ -114,7 +100,6 @@ class ProfileService:
         city: str | None = None,
         education_level: str | None = None,
     ) -> Profile:
-
         profile = self.get_profile_or_raise(user_id)
 
         if qualification is not None:
@@ -122,9 +107,7 @@ class ProfileService:
 
         if avatar_document_id is not None:
             try:
-                document = ProfileDocumentService(
-                    self.session,
-                ).get_by_id_or_raise(
+                document = ProfileDocumentService(self.session).get_by_id_or_raise(
                     avatar_document_id,
                 )
             except DocumentNotFoundError:
