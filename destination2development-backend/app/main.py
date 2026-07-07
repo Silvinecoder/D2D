@@ -2,7 +2,7 @@ from fastapi import FastAPI
 
 import app.models
 
-from app.endpoints import users
+from app.endpoints import users, users_unlock_request
 
 
 app = FastAPI(
@@ -10,6 +10,7 @@ app = FastAPI(
 )
 
 app.include_router(users.router)
+app.include_router(users_unlock_request.router)
 
 
 @app.get("/")
