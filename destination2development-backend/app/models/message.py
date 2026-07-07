@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import uuid
+from datetime import datetime
 from typing import TYPE_CHECKING
 
 from sqlalchemy import DateTime, ForeignKey, String
@@ -24,13 +25,18 @@ class Message(Base, TimestampMixin):
     )
 
     thread_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("message_threads.id"),
+        ForeignKey(
+            "message_threads.id",
+            ondelete="CASCADE",
+        ),
         nullable=False,
-        ondelete="CASCADE"
     )
 
     sender_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("users.id"),
+        ForeignKey(
+            "users.id",
+            ondelete="CASCADE",
+        ),
         nullable=False,
     )
 

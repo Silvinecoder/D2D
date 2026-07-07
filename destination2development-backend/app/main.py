@@ -3,6 +3,10 @@ from fastapi import FastAPI
 import app.models
 
 from app.endpoints import (
+    notifications,
+    message_threads,
+    message_thread_participants,
+    messages,
     profile_languages,
     languages,
     documents_access_request,
@@ -23,6 +27,10 @@ app.include_router(profile_documents.router)
 app.include_router(documents_access_request.router)
 app.include_router(languages.router)
 app.include_router(profile_languages.router)
+app.include_router(messages.router)
+app.include_router(message_thread_participants.router)
+app.include_router(message_threads.router)
+app.include_router(notifications.router)
 
 
 @app.get("/")

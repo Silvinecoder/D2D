@@ -2,9 +2,10 @@ from __future__ import annotations
 
 import enum
 import uuid
+from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import DateTime, Enum, ForeignKey, func
+from sqlalchemy import DateTime, Enum, ForeignKey, func, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -40,13 +41,18 @@ class MessageThreadParticipant(Base, TimestampMixin):
     )
 
     thread_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("message_threads.id"),
+        ForeignKey(
+            "message_threads.id",
+            ondelete="CASCADE",
+        ),
         nullable=False,
-        ondelete="CASCADE",
     )
 
     user_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("users.id"),
+        ForeignKey(
+            "users.id",
+            ondelete="CASCADE",
+        ),
         nullable=False,
     )
 
@@ -69,7 +75,7 @@ class MessageThreadParticipant(Base, TimestampMixin):
         back_populates="participants",
     )
 
-    user = relationship(
+    user: Mapped["User"] = relationship(
         "User",
         back_populates="thread_participations",
     )

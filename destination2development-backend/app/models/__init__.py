@@ -5,3 +5,7 @@ from .profile_language import ProfileLanguage
 from .profile_document import ProfileDocument
 from .document_access_request import DocumentAccessRequest
 from .user_unlock_request import UserUnlockRequest
+from .message import Message
+from .message_thread_participant import MessageThreadParticipant
+from .message_thread import MessageThread
+from .notification import Notification
