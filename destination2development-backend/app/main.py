@@ -3,6 +3,7 @@ from fastapi import FastAPI
 import app.models
 
 from app.endpoints import (
+    documents_access_request,
     profile_documents,
     profiles,
     users,
@@ -17,6 +18,7 @@ app.include_router(users.router)
 app.include_router(users_unlock_request.router)
 app.include_router(profiles.router)
 app.include_router(profile_documents.router)
+app.include_router(documents_access_request.router)
 
 
 @app.get("/")

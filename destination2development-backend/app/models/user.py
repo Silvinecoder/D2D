@@ -113,6 +113,8 @@ class User(Base, TimestampMixin):
         "DocumentAccessRequest",
         back_populates="user",
         foreign_keys="DocumentAccessRequest.user_id",
+        cascade="all, delete-orphan",
+        single_parent=True,
     )
 
     reviewed_access_requests: Mapped[list[DocumentAccessRequest]] = relationship(
