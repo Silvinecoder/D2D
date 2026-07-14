@@ -8,4 +8,5 @@ from .user_unlock_request import UserUnlockRequest
 from .message import Message
 from .message_thread_participant import MessageThreadParticipant
 from .message_thread import MessageThread
+from .support_ticket import SupportTicket
 from .notification import Notification

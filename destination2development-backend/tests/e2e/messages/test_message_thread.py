@@ -52,32 +52,3 @@ def test_list_message_threads(
     threads = response.json()
 
     assert len(threads) >= 1
-
-
-def test_close_ticket(
-    client,
-    disposable_user,
-):
-    response = client.post(
-        "/message-threads",
-        headers={
-            "Authorization": f"Bearer {disposable_user['access_token']}",
-        },
-        json={
-            "message_type": "ticket",
-            "subject": "Support",
-        },
-    )
-
-    thread = response.json()
-
-    response = client.patch(
-        f"/message-threads/{thread['id']}/close",
-        headers={
-            "Authorization": f"Bearer {disposable_user['access_token']}",
-        },
-    )
-
-    assert response.status_code == 200
-
-    assert response.json()["status"] == "closed"

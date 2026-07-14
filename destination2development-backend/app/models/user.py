@@ -20,6 +20,7 @@ if TYPE_CHECKING:
     from .message import Message
     from .message_thread import MessageThread
     from .message_thread_participant import MessageThreadParticipant
+    from .support_ticket import SupportTicket
     from .notification import Notification
 
 
@@ -113,14 +114,12 @@ class User(Base, TimestampMixin):
         foreign_keys="ProfileDocument.verified_by",
     )
 
-    document_access_requests: Mapped[list[DocumentAccessRequest]] = (
-        relationship(
-            "DocumentAccessRequest",
-            back_populates="user",
-            foreign_keys="DocumentAccessRequest.user_id",
-            cascade="all, delete-orphan",
-            single_parent=True,
-        )
+    document_access_requests: Mapped[list[DocumentAccessRequest]] = relationship(
+        "DocumentAccessRequest",
+        back_populates="user",
+        foreign_keys="DocumentAccessRequest.user_id",
+        cascade="all, delete-orphan",
+        single_parent=True,
     )
 
     reviewed_access_requests: Mapped[list[DocumentAccessRequest]] = relationship(
@@ -138,17 +137,28 @@ class User(Base, TimestampMixin):
     messages: Mapped[list["Message"]] = relationship(
         "Message",
         back_populates="sender",
+        passive_deletes=True,
     )
 
     thread_participations: Mapped[list["MessageThreadParticipant"]] = relationship(
         "MessageThreadParticipant",
         back_populates="user",
+        passive_deletes=True,
     )
 
     created_message_threads: Mapped[list["MessageThread"]] = relationship(
         "MessageThread",
         foreign_keys="MessageThread.created_by",
         back_populates="creator",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )
+
+    assigned_tickets: Mapped[list["SupportTicket"]] = relationship(
+        "SupportTicket",
+        foreign_keys="SupportTicket.assigned_admin_id",
+        back_populates="assigned_admin",
+        passive_deletes=True,
     )
 
     notifications: Mapped[list["Notification"]] = relationship(

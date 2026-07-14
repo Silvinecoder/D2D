@@ -13,7 +13,7 @@ class CreateMessageRequest(BaseModel):
 class MessageResponse(BaseModel):
     id: uuid.UUID
     thread_id: uuid.UUID
-    sender_id: uuid.UUID
+    sender_id: uuid.UUID | None
     body: str
     read_at: datetime | None
 

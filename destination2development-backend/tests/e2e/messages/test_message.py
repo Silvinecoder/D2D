@@ -16,12 +16,11 @@ def test_send_message(
     ).json()
 
     response = client.post(
-        "/messages",
+        f"/message-threads/{thread['id']}/messages",
         headers={
             "Authorization": f"Bearer {disposable_user['access_token']}",
         },
         json={
-            "thread_id": thread["id"],
             "body": "Hello world!",
         },
     )
@@ -50,18 +49,17 @@ def test_list_messages(
     ).json()
 
     client.post(
-        "/messages",
+        f"/message-threads/{thread['id']}/messages",
         headers={
             "Authorization": f"Bearer {disposable_user['access_token']}",
         },
         json={
-            "thread_id": thread["id"],
             "body": "First message",
         },
     )
 
     response = client.get(
-        f"/messages/{thread['id']}",
+        f"/message-threads/{thread['id']}/messages",
         headers={
             "Authorization": f"Bearer {disposable_user['access_token']}",
         },
@@ -90,18 +88,17 @@ def test_mark_message_as_read(
     ).json()
 
     message = client.post(
-        "/messages",
+        f"/message-threads/{thread['id']}/messages",
         headers={
             "Authorization": f"Bearer {disposable_user['access_token']}",
         },
         json={
-            "thread_id": thread["id"],
             "body": "Unread",
         },
     ).json()
 
     response = client.patch(
-        f"/messages/{message['id']}/read",
+        f"/message-threads/{thread['id']}/messages/{message['id']}/read",
         headers={
             "Authorization": f"Bearer {disposable_user['access_token']}",
         },

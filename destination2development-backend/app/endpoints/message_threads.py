@@ -3,7 +3,6 @@ from __future__ import annotations
 import uuid
 
 from fastapi import APIRouter, Depends
-
 from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_current_user, get_db
@@ -65,21 +64,3 @@ def get_message_thread(
     service = MessageThreadService(session)
 
     return service.get_by_id_or_raise(thread_id)
-
-
-@router.patch(
-    "/{thread_id}/close",
-    response_model=MessageThreadResponse,
-)
-def close_ticket(
-    thread_id: uuid.UUID,
-    session: Session = Depends(get_db),
-):
-    service = MessageThreadService(session)
-
-    thread = service.close_ticket(thread_id)
-
-    session.commit()
-    session.refresh(thread)
-
-    return thread

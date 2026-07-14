@@ -39,3 +39,15 @@ def admin_user(client):
         yield user
     finally:
         user["cleanup"]()
+
+@pytest.fixture
+def admin_user_two(client):
+    user = create_e2e_user(
+        client,
+        role=SystemRole.admin,
+    )
+
+    try:
+        yield user
+    finally:
+        user["cleanup"]()

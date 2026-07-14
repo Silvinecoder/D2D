@@ -61,7 +61,7 @@ class DocumentAccessRequest(Base, TimestampMixin):
     )
 
     reviewed_by: Mapped[uuid.UUID | None] = mapped_column(
-        ForeignKey("users.id"),
+        ForeignKey("users.id", ondelete="SET NULL"),
         nullable=True,
     )
 

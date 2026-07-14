@@ -4,6 +4,7 @@ import app.models
 
 from app.endpoints import (
     notifications,
+    support_ticket,
     message_threads,
     message_thread_participants,
     messages,
@@ -30,6 +31,7 @@ app.include_router(profile_languages.router)
 app.include_router(messages.router)
 app.include_router(message_thread_participants.router)
 app.include_router(message_threads.router)
+app.include_router(support_ticket.router)
 app.include_router(notifications.router)
 
 

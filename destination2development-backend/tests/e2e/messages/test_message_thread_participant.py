@@ -115,7 +115,7 @@ def test_remove_participant(
         },
     )
 
-    assert response.status_code == 200
+    assert response.status_code == 204
 
     response = client.get(
         f"/message-thread-participants/{thread['id']}",

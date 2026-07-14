@@ -81,12 +81,25 @@ def get_current_active_user(
     return user
 
 
+def require_role(*roles: SystemRole):
+    """
+    restricts an endpoint to one or more system roles.
+    Usage: user: User = Depends(require_role(SystemRole.admin))
+    Or for multiple allowed roles: Depends(require_role(SystemRole.admin, SystemRole.support))
+    """
+
+    def dependency(user: User = Depends(get_current_user)) -> User:
+        if user.system_role not in roles:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You do not have permission to perform this action.",
+            )
+        return user
+
+    return dependency
+
+
 def require_admin(
-    user: User = Depends(get_current_user),
+    user: User = Depends(require_role(SystemRole.admin)),
 ) -> User:
-    if user.system_role != SystemRole.admin:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Admin privileges required.",
-        )
     return user

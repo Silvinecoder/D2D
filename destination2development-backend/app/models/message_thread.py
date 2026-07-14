@@ -14,19 +14,13 @@ from app.assistant.model_helper import Base, TimestampMixin
 if TYPE_CHECKING:
     from .message import Message
     from .message_thread_participant import MessageThreadParticipant
+    from .support_ticket import SupportTicket
     from .user import User
 
 
 class MessageThreadType(str, enum.Enum):
     chat = "chat"
     ticket = "ticket"
-
-
-class TicketStatus(str, enum.Enum):
-    open = "open"
-    pending = "pending"
-    resolved = "resolved"
-    closed = "closed"
 
 
 class MessageThread(Base, TimestampMixin):
@@ -51,16 +45,8 @@ class MessageThread(Base, TimestampMixin):
         nullable=True,
     )
 
-    status: Mapped[TicketStatus | None] = mapped_column(
-        Enum(
-            TicketStatus,
-            name="ticket_status",
-        ),
-        nullable=True,
-    )
-
     created_by: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("users.id"),
+        ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False,
     )
 
@@ -84,5 +70,12 @@ class MessageThread(Base, TimestampMixin):
     messages: Mapped[list["Message"]] = relationship(
         "Message",
         back_populates="thread",
+        cascade="all, delete-orphan",
+    )
+
+    ticket: Mapped["SupportTicket | None"] = relationship(
+        "SupportTicket",
+        back_populates="thread",
+        uselist=False,
         cascade="all, delete-orphan",
     )

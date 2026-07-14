@@ -25,19 +25,16 @@ class Message(Base, TimestampMixin):
     )
 
     thread_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey(
-            "message_threads.id",
-            ondelete="CASCADE",
-        ),
+        ForeignKey("message_threads.id", ondelete="CASCADE"),
         nullable=False,
     )
 
-    sender_id: Mapped[uuid.UUID] = mapped_column(
+    sender_id: Mapped[uuid.UUID | None] = mapped_column(
         ForeignKey(
             "users.id",
-            ondelete="CASCADE",
+            ondelete="SET NULL",
         ),
-        nullable=False,
+        nullable=True,
     )
 
     body: Mapped[str] = mapped_column(

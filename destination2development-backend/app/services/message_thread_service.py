@@ -4,11 +4,7 @@ import uuid
 
 from sqlalchemy import select
 
-from app.models.message_thread import (
-    MessageThread,
-    MessageThreadType,
-    TicketStatus,
-)
+from app.models.message_thread import MessageThread, MessageThreadType
 from app.models.user import User
 from app.services.base_service import CRUDService, utcnow
 
@@ -32,9 +28,6 @@ class MessageThreadService(CRUDService[MessageThread]):
         thread = MessageThread(
             message_type=message_type,
             subject=subject,
-            status=(
-                TicketStatus.open if message_type == MessageThreadType.ticket else None
-            ),
             created_by=creator.id,
         )
 
@@ -53,9 +46,4 @@ class MessageThreadService(CRUDService[MessageThread]):
     def update_last_message(self, thread_id: uuid.UUID):
         thread = self.get_by_id_or_raise(thread_id)
         thread.last_message_at = utcnow()
-        return thread
-
-    def close_ticket(self, thread_id: uuid.UUID):
-        thread = self.get_by_id_or_raise(thread_id)
-        thread.status = TicketStatus.closed
         return thread
