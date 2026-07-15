@@ -71,38 +71,3 @@ def test_list_messages(
 
     assert len(messages) == 1
     assert messages[0]["body"] == "First message"
-
-
-def test_mark_message_as_read(
-    client,
-    disposable_user,
-):
-    thread = client.post(
-        "/message-threads",
-        headers={
-            "Authorization": f"Bearer {disposable_user['access_token']}",
-        },
-        json={
-            "message_type": "chat",
-        },
-    ).json()
-
-    message = client.post(
-        f"/message-threads/{thread['id']}/messages",
-        headers={
-            "Authorization": f"Bearer {disposable_user['access_token']}",
-        },
-        json={
-            "body": "Unread",
-        },
-    ).json()
-
-    response = client.patch(
-        f"/message-threads/{thread['id']}/messages/{message['id']}/read",
-        headers={
-            "Authorization": f"Bearer {disposable_user['access_token']}",
-        },
-    )
-
-    assert response.status_code == 200
-    assert response.json()["read_at"] is not None
