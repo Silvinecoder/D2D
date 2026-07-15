@@ -4,6 +4,7 @@ import uuid
 
 from sqlalchemy import select
 
+from app.core.events import publish
 from app.models.message_thread import MessageThreadType
 from app.models.message_thread_participant import ParticipantRole
 from app.models.support_ticket import (
@@ -124,6 +125,16 @@ class SupportTicketService(CRUDService[SupportTicket]):
             ticket.resolved_at = utcnow()
         elif status == TicketStatus.closed:
             ticket.closed_at = utcnow()
+
+        thread = MessageThreadService(self.session).get_by_id_or_raise(ticket.thread_id)
+
+        publish(
+            "ticket.status_changed",
+            session=self.session,
+            ticket_id=ticket.id,
+            thread_created_by=thread.created_by,
+            new_status=status.value,
+        )
 
         return ticket
 

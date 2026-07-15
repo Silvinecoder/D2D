@@ -4,11 +4,13 @@ import uuid
 
 from sqlalchemy import select
 
+from app.core.events import publish
 from app.models.message import Message
 from app.models.user import User
 from app.services.base import CRUDService, utcnow
 
 from .message_thread import MessageThreadService
+from .message_thread_participant import MessageThreadParticipantService
 
 
 class MessageNotFoundError(Exception):
@@ -27,7 +29,7 @@ class MessageService(CRUDService[Message]):
         body: str,
     ) -> Message:
 
-        MessageThreadService(self.session).get_by_id_or_raise(thread_id)
+        thread = MessageThreadService(self.session).get_by_id_or_raise(thread_id)
 
         message = Message(
             thread_id=thread_id,
@@ -39,6 +41,19 @@ class MessageService(CRUDService[Message]):
         self.session.flush()
 
         MessageThreadService(self.session).update_last_message(thread_id)
+
+        participants = MessageThreadParticipantService(self.session).list_participants(
+            thread_id
+        )
+
+        publish(
+            "message.sent",
+            session=self.session,
+            thread_id=thread_id,
+            sender=sender,
+            thread_subject=thread.subject,
+            participants=participants,
+        )
 
         return message
 
@@ -53,8 +68,3 @@ class MessageService(CRUDService[Message]):
         )
 
         return list(self.session.scalars(stmt))
-
-    def mark_as_read(self, message_id: uuid.UUID):
-        message = self.get_by_id_or_raise(message_id)
-        message.read_at = utcnow()
-        return message

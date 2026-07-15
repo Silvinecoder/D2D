@@ -2,6 +2,8 @@ from fastapi import FastAPI
 
 import app.models
 
+import app.handler.notification
+
 from app.endpoints import (
     notification,
     support_ticket,

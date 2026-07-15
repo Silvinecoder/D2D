@@ -20,6 +20,8 @@ class NotificationEventType(str, enum.Enum):
     ticket_created = "ticket_created"
     ticket_reply = "ticket_reply"
     ticket_assigned = "ticket_assigned"
+    ticket_resolved = "ticket_resolved"
+    ticket_closed = "ticket_closed"
     document_verified = "document_verified"
     document_rejected = "document_rejected"
     document_access_approved = "document_access_approved"
@@ -30,7 +32,7 @@ class NotificationEntityType(str, enum.Enum):
     thread = "thread"
     ticket = "ticket"
     message = "message"
-    profile_document = "profile_document"
+    document_access_request = "document_access_request"
 
 
 class Notification(Base, TimestampMixin):

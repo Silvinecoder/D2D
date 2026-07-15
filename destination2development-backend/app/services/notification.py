@@ -2,10 +2,13 @@ from __future__ import annotations
 
 import uuid
 
-from sqlalchemy import select
+from sqlalchemy import func, select, update
 
-from app.models.notification import Notification
-from app.models.user import User
+from app.models.notification import (
+    Notification,
+    NotificationEntityType,
+    NotificationEventType,
+)
 from app.services.base import CRUDService, utcnow
 
 
@@ -14,22 +17,23 @@ class NotificationNotFoundError(Exception):
 
 
 class NotificationService(CRUDService[Notification]):
+    """Notification service."""
+
     model = Notification
     not_found_error = NotificationNotFoundError
 
     def create_notification(
         self,
         *,
-        user: User,
-        event_type: str,
-        entity_type: str,
+        user_id: uuid.UUID,
+        event_type: NotificationEventType,
+        entity_type: NotificationEntityType,
         entity_id: uuid.UUID,
         title: str,
         body: str,
     ) -> Notification:
-
         notification = Notification(
-            user_id=user.id,
+            user_id=user_id,
             event_type=event_type,
             entity_type=entity_type,
             entity_id=entity_id,
@@ -42,38 +46,62 @@ class NotificationService(CRUDService[Notification]):
 
         return notification
 
-    def list_notifications(
-        self,
-        user_id: uuid.UUID,
-    ) -> list[Notification]:
-
-        stmt = (
-            select(Notification)
-            .where(Notification.user_id == user_id)
-            .order_by(Notification.created_at.desc())
+    def list_notifications(self, user_id: uuid.UUID):
+        notifications = list(
+            self.session.scalars(
+                select(Notification)
+                .where(Notification.user_id == user_id)
+                .order_by(
+                    Notification.read_at.is_not(None),
+                    Notification.created_at.desc(),
+                )
+            )
         )
 
-        return list(self.session.scalars(stmt))
+        unread_count = (
+            self.session.scalar(
+                select(func.count(Notification.id)).where(
+                    Notification.user_id == user_id,
+                    Notification.read_at.is_(None),
+                )
+            )
+            or 0
+        )
+
+        return {
+            "items": notifications,
+            "unread_count": unread_count,
+        }
 
     def mark_as_read(
         self,
+        *,
         notification_id: uuid.UUID,
+        user_id: uuid.UUID,
     ) -> Notification:
+        notification = self.session.scalar(
+            select(Notification).where(
+                Notification.id == notification_id,
+                Notification.user_id == user_id,
+            )
+        )
 
-        notification = self.get_by_id_or_raise(notification_id)
-        notification.read_at = utcnow()
+        if notification is None:
+            raise NotificationNotFoundError()
+
+        if notification.read_at is None:
+            notification.read_at = utcnow()
 
         return notification
 
-    def mark_all_as_read(
-        self,
-        user_id: uuid.UUID,
-    ):
-
-        stmt = select(Notification).where(
-            Notification.user_id == user_id,
-            Notification.read_at.is_(None),
+    def mark_all_as_read(self, user_id: uuid.UUID) -> int:
+        result = self.session.execute(
+            update(Notification)
+            .where(
+                Notification.user_id == user_id,
+                Notification.read_at.is_(None),
+            )
+            .values(read_at=utcnow())
         )
 
-        for notification in self.session.scalars(stmt):
-            notification.read_at = utcnow()
+        return result.rowcount or 0

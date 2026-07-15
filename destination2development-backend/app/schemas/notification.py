@@ -17,7 +17,17 @@ class NotificationResponse(BaseModel):
     title: str
     body: str
 
+    created_at: datetime
     read_at: datetime | None
+
+    model_config = {
+        "from_attributes": True,
+    }
+
+
+class NotificationListResponse(BaseModel):
+    items: list[NotificationResponse]
+    unread_count: int
 
     model_config = {
         "from_attributes": True,
