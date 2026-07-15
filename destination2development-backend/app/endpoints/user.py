@@ -19,8 +19,8 @@ from app.schemas.user import (
     UserResponse,
     UserRoleUpdate,
 )
-from app.services.user_auth0_service import Auth0Service
-from app.services.user_service import (
+from app.services.user_auth0 import Auth0Service
+from app.services.user import (
     UserNotFoundError,
     UserService,
 )

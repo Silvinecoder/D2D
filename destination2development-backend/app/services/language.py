@@ -4,7 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.models.language import Language
-from app.services.base_service import CRUDService
+from app.services.base import CRUDService
 
 
 class LanguageNotFoundError(Exception):

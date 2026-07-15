@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 from app.models.profile import Profile
 from app.models.profile_document import DocumentType
 from app.models.user import User
-from app.services.profile_document_service import (
+from app.services.profile_document import (
     DocumentNotFoundError,
     ProfileDocumentService,
 )

@@ -1,7 +1,7 @@
 from app.core.database import SessionLocal
 
-from app.services.user_auth0_service import Auth0Service
-from app.services.user_service import UserService
+from app.services.user_auth0 import Auth0Service
+from app.services.user import UserService
 
 
 def run():

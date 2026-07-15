@@ -8,10 +8,10 @@ from app.models.message_thread_participant import (
     MessageThreadParticipant,
     ParticipantRole,
 )
-from app.services.base_service import CRUDService
+from app.services.base import CRUDService
 
-from .message_thread_service import MessageThreadService
-from .user_service import UserService
+from .message_thread import MessageThreadService
+from .user import UserService
 
 
 class ParticipantNotFoundError(Exception):

@@ -13,7 +13,7 @@ from app.models.user_unlock_request import (
     UnlockRequestStatus,
     UserUnlockRequest,
 )
-from app.services.base_service import CRUDService
+from app.services.base import CRUDService
 
 
 class UnlockRequestNotFoundError(Exception):

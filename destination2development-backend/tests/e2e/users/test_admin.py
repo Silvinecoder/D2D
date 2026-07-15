@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import UTC, datetime, timedelta
 
 from app.core.database import SessionLocal
-from app.services.user_service import UserService
+from app.services.user import UserService
 
 
 def test_get_all_users_admin(client, admin_user):

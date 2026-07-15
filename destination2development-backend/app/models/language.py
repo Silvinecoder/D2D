@@ -6,7 +6,7 @@ from sqlalchemy import String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.assistant.model_helper import Base, TimestampMixin
+from app.helpers.model import Base, TimestampMixin
 
 
 class Language(Base, TimestampMixin):

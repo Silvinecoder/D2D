@@ -11,7 +11,7 @@ from app.schemas.message import (
     CreateMessageRequest,
     MessageResponse,
 )
-from app.services.message_service import MessageService
+from app.services.message import MessageService
 
 router = APIRouter(
     prefix="/message-threads/{thread_id}/messages",

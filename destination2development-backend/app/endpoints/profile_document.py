@@ -20,7 +20,7 @@ from app.schemas.profile_document import (
     ProfileDocumentCreate,
     ProfileDocumentResponse,
 )
-from app.services.profile_document_service import (
+from app.services.profile_document import (
     DocumentAlreadyExistsError,
     DocumentNotFoundError,
     InvalidDocumentStateError,

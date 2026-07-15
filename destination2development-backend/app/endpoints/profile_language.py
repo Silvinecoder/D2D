@@ -12,11 +12,11 @@ from app.schemas.profile_language import (
     ProfileLanguageCreate,
     ProfileLanguageResponse,
 )
-from app.services.profile_language_service import (
+from app.services.profile_language import (
     LanguageNotFoundError,
     ProfileLanguageService,
 )
-from app.services.profile_service import (
+from app.services.profile import (
     ProfileNotFoundError,
     ProfileService,
 )

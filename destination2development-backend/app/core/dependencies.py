@@ -11,8 +11,8 @@ from sqlalchemy.orm import Session
 from app.core.config import settings
 from app.core.database import SessionLocal
 from app.models.user import SystemRole, User
-from app.services.user_auth0_service import Auth0Service
-from app.services.user_service import UserService
+from app.services.user_auth0 import Auth0Service
+from app.services.user import UserService
 
 auth0 = Auth0FastAPI(
     domain=settings.AUTH0_DOMAIN,

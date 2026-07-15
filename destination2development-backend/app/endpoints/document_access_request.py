@@ -16,7 +16,7 @@ from app.schemas.document_access_request import (
     DocumentAccessRequestCreate,
     DocumentAccessRequestResponse,
 )
-from app.services.document_access_request_service import (
+from app.services.document_access_request import (
     AccessRequestAlreadyProcessedError,
     AccessRequestNotFoundError,
     DocumentAccessRequestService,

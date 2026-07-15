@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_db
 from app.schemas.language import LanguageResponse
-from app.services.language_service import (
+from app.services.language import (
     LanguageNotFoundError,
     LanguageService,
 )

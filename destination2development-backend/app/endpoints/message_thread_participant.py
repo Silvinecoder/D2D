@@ -12,7 +12,7 @@ from app.schemas.message_thread_participant import (
     MessageThreadParticipantResponse,
     RemoveMessageThreadParticipantRequest,
 )
-from app.services.message_thread_participant_service import (
+from app.services.message_thread_participant import (
     MessageThreadParticipantService,
 )
 

@@ -8,7 +8,7 @@ from sqlalchemy import Enum, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.assistant.model_helper import Base, TimestampMixin
+from app.helpers.model import Base, TimestampMixin
 
 if TYPE_CHECKING:
     from .language import Language

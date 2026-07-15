@@ -117,8 +117,7 @@ def test_admin_claims_ticket_and_works_it_through_to_closed(
     ).json()
 
     assert any(
-        p["user_id"] == str(admin_user["user_id"])
-        and p["role"] == "support"
+        p["user_id"] == str(admin_user["user_id"]) and p["role"] == "support"
         for p in participants
     )
 

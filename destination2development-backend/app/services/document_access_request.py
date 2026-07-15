@@ -10,7 +10,7 @@ from app.models.document_access_request import (
     Status,
 )
 from app.models.user import User
-from app.services.base_service import CRUDService, utcnow
+from app.services.base import CRUDService, utcnow
 
 
 class AccessRequestNotFoundError(Exception):

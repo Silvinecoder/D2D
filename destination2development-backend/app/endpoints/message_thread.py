@@ -10,7 +10,7 @@ from app.schemas.message_thread import (
     CreateMessageThreadRequest,
     MessageThreadResponse,
 )
-from app.services.message_thread_service import MessageThreadService
+from app.services.message_thread import MessageThreadService
 
 router = APIRouter(
     prefix="/message-threads",

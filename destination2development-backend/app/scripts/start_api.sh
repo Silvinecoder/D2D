@@ -18,7 +18,7 @@ echo "Running migrations..."
 uv run alembic upgrade head
 
 echo "Seeding languages..."
-uv run python -m app.seeds.languages
+uv run python -m app.data_seeds.languages
 
 echo "Starting API..."
 exec "$@"

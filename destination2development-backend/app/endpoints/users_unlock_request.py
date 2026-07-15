@@ -15,7 +15,7 @@ from app.schemas.user_unlock_request import (
     UnlockRequestCreate,
     UnlockRequestResponse,
 )
-from app.services.user_unlock_request_service import (
+from app.services.user_unlock_request import (
     UserUnlockRequestService,
 )
 

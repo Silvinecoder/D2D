@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_current_user, get_db
 from app.schemas.notification import NotificationResponse
-from app.services.notification_service import NotificationService
+from app.services.notification import NotificationService
 
 router = APIRouter(
     prefix="/notifications",

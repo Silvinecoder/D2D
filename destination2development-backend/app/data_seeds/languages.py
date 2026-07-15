@@ -1,6 +1,6 @@
 from app.core.database import SessionLocal
 from app.models.language import Language
-from app.services.language_service import LanguageService
+from app.services.language import LanguageService
 
 
 DEFAULT_LANGUAGES = [

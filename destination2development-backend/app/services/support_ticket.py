@@ -12,10 +12,10 @@ from app.models.support_ticket import (
     can_transition,
 )
 from app.models.user import User, SystemRole
-from app.services.base_service import CRUDService, utcnow
+from app.services.base import CRUDService, utcnow
 
-from .message_thread_participant_service import MessageThreadParticipantService
-from .message_thread_service import MessageThreadService
+from .message_thread_participant import MessageThreadParticipantService
+from .message_thread import MessageThreadService
 
 
 class SupportTicketNotFoundError(Exception):

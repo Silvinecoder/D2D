@@ -10,10 +10,10 @@ RUN uv sync
 
 COPY . .
 
-COPY app/scripts/start.sh /start.sh
+COPY app/scripts/start_api.sh /start_api.sh
 
-RUN chmod +x /start.sh
+RUN chmod +x /start_api.sh
 
-ENTRYPOINT ["/start.sh"]
+ENTRYPOINT ["/start_api.sh"]
 
 CMD ["uv", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

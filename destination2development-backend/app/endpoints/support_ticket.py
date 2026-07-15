@@ -14,13 +14,13 @@ from app.schemas.support_ticket import (
     SupportTicketResponse,
     UpdateTicketStatusRequest,
 )
-from app.services.support_ticket_service import (
+from app.services.support_ticket import (
     InvalidAssigneeError,
     InvalidTicketTransitionError,
     SupportTicketService,
     TicketAlreadyAssignedError,
 )
-from app.services.user_service import UserService
+from app.services.user import UserService
 
 router = APIRouter(
     prefix="/support-tickets",

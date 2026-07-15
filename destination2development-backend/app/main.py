@@ -3,17 +3,17 @@ from fastapi import FastAPI
 import app.models
 
 from app.endpoints import (
-    notifications,
+    notification,
     support_ticket,
-    message_threads,
-    message_thread_participants,
-    messages,
-    profile_languages,
-    languages,
-    documents_access_request,
-    profile_documents,
-    profiles,
-    users,
+    message_thread,
+    message_thread_participant,
+    message,
+    profile_language,
+    language,
+    document_access_request,
+    profile_document,
+    profile,
+    user,
     users_unlock_request,
 )
 
@@ -21,18 +21,18 @@ app = FastAPI(
     title="Destination2Development API",
 )
 
-app.include_router(users.router)
+app.include_router(user.router)
 app.include_router(users_unlock_request.router)
-app.include_router(profiles.router)
-app.include_router(profile_documents.router)
-app.include_router(documents_access_request.router)
-app.include_router(languages.router)
-app.include_router(profile_languages.router)
-app.include_router(messages.router)
-app.include_router(message_thread_participants.router)
-app.include_router(message_threads.router)
+app.include_router(profile.router)
+app.include_router(profile_document.router)
+app.include_router(document_access_request.router)
+app.include_router(language.router)
+app.include_router(profile_language.router)
+app.include_router(message.router)
+app.include_router(message_thread_participant.router)
+app.include_router(message_thread.router)
 app.include_router(support_ticket.router)
-app.include_router(notifications.router)
+app.include_router(notification.router)
 
 
 @app.get("/")

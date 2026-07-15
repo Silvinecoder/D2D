@@ -13,7 +13,7 @@ from app.schemas.profile import (
     ProfileResponse,
     ProfileUpdate,
 )
-from app.services.profile_service import (
+from app.services.profile import (
     InvalidAvatarDocumentError,
     ProfileAlreadyExistsError,
     ProfileNotFoundError,

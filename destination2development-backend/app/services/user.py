@@ -12,7 +12,7 @@ from app.models.user import (
     User,
 )
 from app.schemas.user_auth0 import Auth0User
-from app.services.base_service import CRUDService, utcnow
+from app.services.base import CRUDService, utcnow
 
 
 class UserNotFoundError(Exception):

@@ -6,7 +6,7 @@ from sqlalchemy import select
 
 from app.models.message_thread import MessageThread, MessageThreadType
 from app.models.user import User
-from app.services.base_service import CRUDService, utcnow
+from app.services.base import CRUDService, utcnow
 
 
 class MessageThreadNotFoundError(Exception):
