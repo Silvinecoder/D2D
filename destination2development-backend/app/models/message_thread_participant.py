@@ -19,6 +19,7 @@ if TYPE_CHECKING:
 class ParticipantRole(str, enum.Enum):
     student = "student"
     assessor = "assessor"
+    director = "director"
     admin = "admin"
     support = "support"
 
