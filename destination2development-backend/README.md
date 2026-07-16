@@ -105,8 +105,6 @@ The database stores application-specific information such as:
 
 # Local Development
 
-## Clean Rebuild (Docker + uv + Python caches)
-
 For a complete local development reset:
 
 ```bash
