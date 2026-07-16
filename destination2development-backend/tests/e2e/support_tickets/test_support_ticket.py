@@ -116,10 +116,14 @@ def test_admin_claims_ticket_and_works_it_through_to_closed(
         },
     ).json()
 
-    assert any(
-        p["user_id"] == str(admin_user["user_id"]) and p["role"] == "support"
-        for p in participants
-    )
+    assert len(participants) == 2
+
+    participant_ids = {p["user_id"] for p in participants}
+
+    assert participant_ids == {
+        str(student_user["user_id"]),
+        str(admin_user["user_id"]),
+    }
 
     resolve_response = client.patch(
         f"/support-tickets/{ticket['id']}/status",

@@ -10,7 +10,7 @@ def test_student_and_assessor_can_exchange_messages(
     thread_response = client.post(
         "/message-threads",
         headers={
-            "Authorization": f"Bearer{student_user['access_token']}",
+            "Authorization": f"Bearer {student_user['access_token']}",
         },
         json={
             "message_type": "chat",
