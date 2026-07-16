@@ -26,11 +26,11 @@ def upload_profile_document(
 
 def test_upload_profile_document(
     client,
-    disposable_user,
+    student_user,
 ):
     document = upload_profile_document(
         client,
-        disposable_user["access_token"],
+        student_user["access_token"],
     )
 
     assert document["document_type"] == "profile_photo"
@@ -40,17 +40,17 @@ def test_upload_profile_document(
 
 def test_upload_duplicate_document_returns_conflict(
     client,
-    disposable_user,
+    student_user,
 ):
     upload_profile_document(
         client,
-        disposable_user["access_token"],
+        student_user["access_token"],
     )
 
     response = client.post(
         "/profile-documents",
         headers={
-            "Authorization": f"Bearer {disposable_user['access_token']}",
+            "Authorization": f"Bearer {student_user['access_token']}",
         },
         json={
             "document_type": "profile_photo",
@@ -64,17 +64,17 @@ def test_upload_duplicate_document_returns_conflict(
 
 def test_get_my_documents(
     client,
-    disposable_user,
+    student_user,
 ):
     upload_profile_document(
         client,
-        disposable_user["access_token"],
+        student_user["access_token"],
     )
 
     response = client.get(
         "/profile-documents",
         headers={
-            "Authorization": f"Bearer {disposable_user['access_token']}",
+            "Authorization": f"Bearer {student_user['access_token']}",
         },
     )
 
@@ -88,12 +88,12 @@ def test_get_my_documents(
 
 def test_admin_can_list_documents(
     client,
-    disposable_user,
+    student_user,
     admin_user,
 ):
     upload_profile_document(
         client,
-        disposable_user["access_token"],
+        student_user["access_token"],
     )
 
     response = client.get(
@@ -112,12 +112,12 @@ def test_admin_can_list_documents(
 
 def test_admin_can_move_document_to_review(
     client,
-    disposable_user,
+    student_user,
     admin_user,
 ):
     document = upload_profile_document(
         client,
-        disposable_user["access_token"],
+        student_user["access_token"],
     )
 
     response = client.patch(
@@ -136,12 +136,12 @@ def test_admin_can_move_document_to_review(
 
 def test_admin_can_approve_document(
     client,
-    disposable_user,
+    student_user,
     admin_user,
 ):
     document = upload_profile_document(
         client,
-        disposable_user["access_token"],
+        student_user["access_token"],
     )
 
     review_response = client.patch(
@@ -171,12 +171,12 @@ def test_admin_can_approve_document(
 
 def test_admin_cannot_approve_already_approved_document(
     client,
-    disposable_user,
+    student_user,
     admin_user,
 ):
     document = upload_profile_document(
         client,
-        disposable_user["access_token"],
+        student_user["access_token"],
     )
 
     client.patch(
@@ -199,12 +199,12 @@ def test_admin_cannot_approve_already_approved_document(
 
 def test_admin_can_reject_document(
     client,
-    disposable_user,
+    student_user,
     admin_user,
 ):
     document = upload_profile_document(
         client,
-        disposable_user["access_token"],
+        student_user["access_token"],
     )
 
     response = client.patch(

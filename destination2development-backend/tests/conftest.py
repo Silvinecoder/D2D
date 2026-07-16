@@ -4,7 +4,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app
-from app.models.user import SystemRole
+from app.models.user import AccountType, SystemRole
 
 from tests.e2e.helpers.e2e_user_factory import create_e2e_user
 
@@ -16,10 +16,25 @@ def client():
 
 
 @pytest.fixture
-def disposable_user(client):
+def student_user(client):
     user = create_e2e_user(
         client,
         role=SystemRole.user,
+        account_type=AccountType.student,
+    )
+
+    try:
+        yield user
+    finally:
+        user["cleanup"]()
+
+
+@pytest.fixture
+def assessor_user(client):
+    user = create_e2e_user(
+        client,
+        role=SystemRole.user,
+        account_type=AccountType.assessor,
     )
 
     try:
@@ -33,6 +48,7 @@ def admin_user(client):
     user = create_e2e_user(
         client,
         role=SystemRole.admin,
+        account_type=AccountType.student,
     )
 
     try:
@@ -46,6 +62,7 @@ def admin_user_two(client):
     user = create_e2e_user(
         client,
         role=SystemRole.admin,
+        account_type=AccountType.student,
     )
 
     try:

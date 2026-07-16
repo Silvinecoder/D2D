@@ -7,8 +7,8 @@ from app.core.config import settings
 from tests.e2e.helpers.auth0 import get_access_token
 
 
-def test_get_current_user(client, disposable_user):
-    access_token = disposable_user["access_token"]
+def test_get_current_user(client, student_user):
+    access_token = student_user["access_token"]
 
     response = client.get(
         "/users/current",
@@ -21,13 +21,13 @@ def test_get_current_user(client, disposable_user):
 
     user = response.json()
 
-    assert user["email"] == disposable_user["email"]
+    assert user["email"] == student_user["email"]
     assert user["system_role"] == "user"
     assert user["account_status"] == "active"
 
 
-def test_update_current_user_name(client, disposable_user):
-    access_token = disposable_user["access_token"]
+def test_update_current_user_name(client, student_user):
+    access_token = student_user["access_token"]
 
     response = client.patch(
         "/users/current/name",
@@ -53,8 +53,8 @@ def test_update_current_user_name(client, disposable_user):
     assert user["name"] == "Jason"
 
 
-def test_create_new_user(client, disposable_user):
-    access_token = disposable_user["access_token"]
+def test_create_new_user(client, student_user):
+    access_token = student_user["access_token"]
 
     response = client.get(
         "/users/current",
@@ -67,15 +67,15 @@ def test_create_new_user(client, disposable_user):
 
     user = response.json()
 
-    assert user["email"] == disposable_user["email"]
-    assert user["name"] == disposable_user["name"]
+    assert user["email"] == student_user["email"]
+    assert user["name"] == student_user["name"]
     assert user["system_role"] == "user"
     assert user["account_status"] == "active"
     assert user["last_login_at"] is not None
 
 
-def test_update_current_user_password(client, disposable_user):
-    access_token = disposable_user["access_token"]
+def test_update_current_user_password(client, student_user):
+    access_token = student_user["access_token"]
 
     new_password = "New-Test-Password-456!"
 
@@ -95,8 +95,8 @@ def test_update_current_user_password(client, disposable_user):
         f"https://{settings.AUTH0_DOMAIN}/oauth/token",
         json={
             "grant_type": settings.AUTH0_PASSWORD_GRANT_TYPE,
-            "username": disposable_user["email"],
-            "password": disposable_user["password"],
+            "username": student_user["email"],
+            "password": student_user["password"],
             "realm": "Username-Password-Authentication",
             "audience": settings.AUTH0_AUDIENCE,
             "client_id": settings.AUTH0_CLIENT_ID,
@@ -109,17 +109,17 @@ def test_update_current_user_password(client, disposable_user):
     assert old_login.status_code != 200
 
     new_access_token = get_access_token(
-        disposable_user["email"],
+        student_user["email"],
         new_password,
     )
 
     assert new_access_token
 
 
-def test_update_current_user_email(client, disposable_user):
-    access_token = disposable_user["access_token"]
+def test_update_current_user_email(client, student_user):
+    access_token = student_user["access_token"]
 
-    new_email = f"updated-{disposable_user['auth0_id'][-12:]}@example.com"
+    new_email = f"updated-{student_user['auth0_id'][-12:]}@example.com"
 
     response = client.patch(
         "/users/current/email",
@@ -148,14 +148,14 @@ def test_update_current_user_email(client, disposable_user):
 
     new_login_token = get_access_token(
         new_email,
-        disposable_user["password"],
+        student_user["password"],
     )
 
     assert new_login_token
 
 
-def test_delete_current_user(client, disposable_user):
-    access_token = disposable_user["access_token"]
+def test_delete_current_user(client, student_user):
+    access_token = student_user["access_token"]
 
     response = client.delete(
         "/users/current",

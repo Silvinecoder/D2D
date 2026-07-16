@@ -36,6 +36,12 @@ class SystemRole(str, enum.Enum):
     user = "user"
 
 
+class AccountType(str, enum.Enum):
+    business = "business"
+    student = "student"
+    assessor = "assessor"
+
+
 class User(Base, TimestampMixin):
     __tablename__ = "users"
 
@@ -72,6 +78,14 @@ class User(Base, TimestampMixin):
         Enum(SystemRole, name="system_role"),
         default=SystemRole.user,
         nullable=False,
+    )
+
+    account_type: Mapped[AccountType | None] = mapped_column(
+        Enum(
+            AccountType,
+            name="account_type",
+        ),
+        nullable=True,
     )
 
     last_login_at: Mapped[datetime.datetime | None] = mapped_column(

@@ -3,13 +3,13 @@ from __future__ import annotations
 
 def _create_ticket(
     client,
-    disposable_user,
+    student_user,
     subject="Can't access my course",
 ):
     response = client.post(
         "/support-tickets",
         headers={
-            "Authorization": f"Bearer {disposable_user['access_token']}",
+            "Authorization": f"Bearer {student_user['access_token']}",
         },
         json={
             "subject": subject,
@@ -23,12 +23,12 @@ def _create_ticket(
 
 def test_student_can_raise_a_ticket_but_not_view_the_queue(
     client,
-    disposable_user,
+    student_user,
 ):
     response = client.post(
         "/support-tickets",
         headers={
-            "Authorization": f"Bearer {disposable_user['access_token']}",
+            "Authorization": f"Bearer {student_user['access_token']}",
         },
         json={
             "subject": "Can't access my course",
@@ -56,7 +56,7 @@ def test_student_can_raise_a_ticket_but_not_view_the_queue(
     queue_response = client.get(
         "/support-tickets",
         headers={
-            "Authorization": f"Bearer {disposable_user['access_token']}",
+            "Authorization": f"Bearer {student_user['access_token']}",
         },
     )
 
@@ -65,10 +65,10 @@ def test_student_can_raise_a_ticket_but_not_view_the_queue(
 
 def test_admin_sees_new_ticket_in_the_unassigned_queue(
     client,
-    disposable_user,
+    student_user,
     admin_user,
 ):
-    ticket = _create_ticket(client, disposable_user)
+    ticket = _create_ticket(client, student_user)
 
     response = client.get(
         "/support-tickets",
@@ -90,10 +90,10 @@ def test_admin_sees_new_ticket_in_the_unassigned_queue(
 
 def test_admin_claims_ticket_and_works_it_through_to_closed(
     client,
-    disposable_user,
+    student_user,
     admin_user,
 ):
-    ticket = _create_ticket(client, disposable_user, "Help!")
+    ticket = _create_ticket(client, student_user, "Help!")
 
     claim_response = client.patch(
         f"/support-tickets/{ticket['id']}/claim",
@@ -172,10 +172,10 @@ def test_admin_claims_ticket_and_works_it_through_to_closed(
 
 def test_ticket_cannot_skip_straight_to_resolved(
     client,
-    disposable_user,
+    student_user,
     admin_user,
 ):
-    ticket = _create_ticket(client, disposable_user)
+    ticket = _create_ticket(client, student_user)
 
     response = client.patch(
         f"/support-tickets/{ticket['id']}/status",
@@ -192,11 +192,11 @@ def test_ticket_cannot_skip_straight_to_resolved(
 
 def test_second_admin_cannot_steal_a_claimed_ticket(
     client,
-    disposable_user,
+    student_user,
     admin_user,
     admin_user_two,
 ):
-    ticket = _create_ticket(client, disposable_user, "Help!")
+    ticket = _create_ticket(client, student_user, "Help!")
 
     client.patch(
         f"/support-tickets/{ticket['id']}/claim",
@@ -217,10 +217,10 @@ def test_second_admin_cannot_steal_a_claimed_ticket(
 
 def test_admin_can_unassign_a_ticket_back_to_the_queue(
     client,
-    disposable_user,
+    student_user,
     admin_user,
 ):
-    ticket = _create_ticket(client, disposable_user, "Help!")
+    ticket = _create_ticket(client, student_user, "Help!")
 
     client.patch(
         f"/support-tickets/{ticket['id']}/claim",
@@ -246,15 +246,15 @@ def test_admin_can_unassign_a_ticket_back_to_the_queue(
 
 def test_students_are_blocked_from_triage_actions(
     client,
-    disposable_user,
+    student_user,
     admin_user,
 ):
-    ticket = _create_ticket(client, disposable_user, "Help!")
+    ticket = _create_ticket(client, student_user, "Help!")
 
     status_response = client.patch(
         f"/support-tickets/{ticket['id']}/status",
         headers={
-            "Authorization": f"Bearer {disposable_user['access_token']}",
+            "Authorization": f"Bearer {student_user['access_token']}",
         },
         json={
             "status": "in_progress",
@@ -266,7 +266,7 @@ def test_students_are_blocked_from_triage_actions(
     claim_response = client.patch(
         f"/support-tickets/{ticket['id']}/claim",
         headers={
-            "Authorization": f"Bearer {disposable_user['access_token']}",
+            "Authorization": f"Bearer {student_user['access_token']}",
         },
     )
 
@@ -275,10 +275,10 @@ def test_students_are_blocked_from_triage_actions(
     assign_response = client.patch(
         f"/support-tickets/{ticket['id']}/assign",
         headers={
-            "Authorization": f"Bearer {disposable_user['access_token']}",
+            "Authorization": f"Bearer {student_user['access_token']}",
         },
         json={
-            "admin_id": str(disposable_user["user_id"]),
+            "admin_id": str(student_user["user_id"]),
         },
     )
 
@@ -290,7 +290,7 @@ def test_students_are_blocked_from_triage_actions(
             "Authorization": f"Bearer {admin_user['access_token']}",
         },
         json={
-            "admin_id": str(disposable_user["user_id"]),
+            "admin_id": str(student_user["user_id"]),
         },
     )
 
