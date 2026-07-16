@@ -28,6 +28,7 @@ class AccountStatus(str, enum.Enum):
     active = "active"
     locked = "locked"
     pending_verification = "pending_verification"
+    deactivated = "deactivated"
 
 
 class SystemRole(str, enum.Enum):
@@ -79,16 +80,6 @@ class User(Base, TimestampMixin):
     )
 
     deactivated_at: Mapped[datetime.datetime | None] = mapped_column(
-        DateTime(timezone=True),
-        nullable=True,
-    )
-
-    scheduled_deletion_at: Mapped[datetime.datetime | None] = mapped_column(
-        DateTime(timezone=True),
-        nullable=True,
-    )
-
-    deleted_at: Mapped[datetime.datetime | None] = mapped_column(
         DateTime(timezone=True),
         nullable=True,
     )

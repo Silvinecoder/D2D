@@ -168,8 +168,8 @@ def test_delete_current_user(client, disposable_user):
 
     user = response.json()
 
+    assert user["account_status"] == "deactivated"
     assert user["deactivated_at"] is not None
-    assert user["scheduled_deletion_at"] is not None
 
     response = client.get(
         "/users/current",

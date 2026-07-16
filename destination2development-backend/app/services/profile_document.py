@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import uuid
 
-from sqlalchemy import select
+from sqlalchemy import select, delete
 from sqlalchemy.orm import Session
 
 from app.models.profile_document import (
@@ -110,3 +110,14 @@ class ProfileDocumentService(CRUDService[ProfileDocument]):
             stmt = stmt.where(ProfileDocument.verification_status == status)
 
         return list(self.session.execute(stmt).scalars().all())
+
+    def remove_optional_profile_documents(
+        self,
+        user_id: uuid.UUID,
+    ) -> None:
+        self.session.execute(
+            delete(ProfileDocument).where(
+                ProfileDocument.user_id == user_id,
+                ProfileDocument.document_type == DocumentType.profile_photo,
+            )
+        )

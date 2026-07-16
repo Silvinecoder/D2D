@@ -15,15 +15,10 @@ class UserResponse(BaseModel):
     id: uuid.UUID
     email: EmailStr
     name: str
-
     account_status: AccountStatus
     system_role: SystemRole
-
-    last_login_at: datetime | None
-
-    deactivated_at: datetime | None
-    scheduled_deletion_at: datetime | None
-    deleted_at: datetime | None
+    last_login_at: datetime | None = None
+    deactivated_at: datetime | None = None
 
     model_config = {
         "from_attributes": True,

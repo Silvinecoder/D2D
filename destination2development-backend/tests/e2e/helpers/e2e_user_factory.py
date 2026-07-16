@@ -73,7 +73,7 @@ def create_e2e_user(
             user = service.get_by_auth0_id(auth0_user.auth0_id)
 
             if user:
-                service.permanently_delete_user(user.id)
+                service.permanently_delete(user.id)
                 session.commit()
 
         except Exception as e:

@@ -224,3 +224,67 @@ def test_unlock_request_admin_forbidden_for_regular_user(
     )
 
     assert response.status_code in (401, 403)
+
+
+def test_create_unlock_request_conflict_if_not_locked(client, disposable_user):
+    response = client.post(
+        "/unlock-requests",
+        headers={
+            "Authorization": f"Bearer {disposable_user['access_token']}",
+        },
+        json={
+            "message": "Please unlock my account.",
+        },
+    )
+
+    assert response.status_code == 409
+
+
+def test_approve_unlock_request_conflict_if_already_approved(
+    client,
+    admin_user,
+    disposable_user,
+):
+    response = client.patch(
+        f"/users/admin/{disposable_user['user_id']}/lock",
+        headers={
+            "Authorization": f"Bearer {admin_user['access_token']}",
+        },
+    )
+
+    assert response.status_code == 200
+
+    response = client.post(
+        "/unlock-requests",
+        headers={
+            "Authorization": f"Bearer {disposable_user['access_token']}",
+        },
+        json={
+            "message": "Please unlock me.",
+        },
+    )
+
+    assert response.status_code == 200
+
+    request_id = response.json()["id"]
+
+    # First approval succeeds and reactivates the account.
+    response = client.patch(
+        f"/unlock-requests/admin/{request_id}/approve",
+        headers={
+            "Authorization": f"Bearer {admin_user['access_token']}",
+        },
+    )
+
+    assert response.status_code == 200
+
+    # Approving the same (now-stale) request again should fail: the
+    # account is no longer locked.
+    response = client.patch(
+        f"/unlock-requests/admin/{request_id}/approve",
+        headers={
+            "Authorization": f"Bearer {admin_user['access_token']}",
+        },
+    )
+
+    assert response.status_code == 409

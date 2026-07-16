@@ -21,9 +21,11 @@ from app.schemas.user import (
 )
 from app.services.user_auth0 import Auth0Service
 from app.services.user import (
+    AccountNotDeactivatedError,
     UserNotFoundError,
     UserService,
 )
+from app.services.account_deletion import AccountDeletionService
 
 
 router = APIRouter(
@@ -125,12 +127,14 @@ def update_current_user_password(
     "/current",
     response_model=UserResponse,
 )
-def delete_current_user(
+def deactivate_current_user(
     user: User = Depends(get_current_user),
     session: Session = Depends(get_db),
 ):
     try:
-        user = UserService(session).schedule_deletion(user.id)
+        user = AccountDeletionService(session).deactivate(
+            user.id,
+        )
 
         session.commit()
 
@@ -227,29 +231,6 @@ def lock_user(
 
 
 @router.patch(
-    "/admin/{user_id}/deactivate",
-    response_model=UserResponse,
-)
-def deactivate_user(
-    user_id: uuid.UUID,
-    session: Session = Depends(get_db),
-    _admin: User = Depends(require_admin),
-):
-    try:
-        user = UserService(session).schedule_deletion(user_id)
-
-        session.commit()
-
-        return user
-
-    except UserNotFoundError:
-        raise HTTPException(
-            status_code=404,
-            detail="User not found.",
-        )
-
-
-@router.patch(
     "/admin/{user_id}/restore",
     response_model=UserResponse,
 )
@@ -259,7 +240,7 @@ def restore_user(
     _admin: User = Depends(require_admin),
 ):
     try:
-        user = UserService(session).restore_user(user_id)
+        user = AccountDeletionService(session).restore(user_id)
 
         session.commit()
 
@@ -270,33 +251,33 @@ def restore_user(
             status_code=404,
             detail="User not found.",
         )
+    except AccountNotDeactivatedError:
+        raise HTTPException(
+            status_code=409,
+            detail="User account is not deactivated.",
+        )
 
 
-@router.post(
-    "/admin/process-deletions",
-    response_model=list[UserResponse],
+@router.delete(
+    "/admin/{user_id}",
+    response_model=UserResponse,
 )
-def process_scheduled_deletions(
+def delete_user(
+    user_id: uuid.UUID,
     session: Session = Depends(get_db),
     _admin: User = Depends(require_admin),
 ):
-    """Permanently deletes users whose scheduled_deletion_at has passed.
+    try:
+        user = AccountDeletionService(session).permanently_delete(user_id)
 
-    UserService already had get_users_ready_for_deletion() and
-    permanently_delete_user(), but nothing ever called them, so
-    scheduled deletions were never actually carried out. Snapshot each
-    user into a response before deleting, since there's nothing left
-    to serialize afterward.
-    """
-    service = UserService(session)
+        response = UserResponse.model_validate(user)
 
-    users = service.get_users_ready_for_deletion()
+        session.commit()
 
-    deleted = [UserResponse.model_validate(user) for user in users]
+        return response
 
-    for user in users:
-        service.permanently_delete_user(user.id)
-
-    session.commit()
-
-    return deleted
+    except UserNotFoundError:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found.",
+        )

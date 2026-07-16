@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import uuid
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.core.dependencies import (
@@ -16,9 +16,10 @@ from app.schemas.user_unlock_request import (
     UnlockRequestResponse,
 )
 from app.services.user_unlock_request import (
+    AccountNotLockedError,
     UserUnlockRequestService,
+    UnlockRequestNotFoundError
 )
-
 
 router = APIRouter(
     prefix="/unlock-requests",
@@ -26,7 +27,7 @@ router = APIRouter(
 )
 
 
-# USER CREATES REQUEST
+# USER
 
 
 @router.post(
@@ -38,16 +39,24 @@ def create_unlock_request(
     user: User = Depends(get_current_user),
     session: Session = Depends(get_db),
 ):
-    request = UserUnlockRequestService(session).create_request(
-        user=user,
-        message=data.message,
-    )
-    session.commit()
+    try:
+        request = UserUnlockRequestService(session).create_request(
+            user=user,
+            message=data.message,
+        )
 
-    return request
+        session.commit()
+
+        return request
+
+    except AccountNotLockedError:
+        raise HTTPException(
+            status_code=409,
+            detail="Account is not locked.",
+        )
 
 
-# ADMIN LISTS REQUESTS
+# ADMIN
 
 
 @router.get(
@@ -61,9 +70,6 @@ def list_unlock_requests(
     return UserUnlockRequestService(session).get_pending_requests()
 
 
-# ADMIN APPROVES
-
-
 @router.patch(
     "/admin/{request_id}/approve",
     response_model=UnlockRequestResponse,
@@ -73,15 +79,25 @@ def approve_unlock_request(
     session: Session = Depends(get_db),
     _admin: User = Depends(require_admin),
 ):
-    request = UserUnlockRequestService(session).approve_request(
-        request_id,
-    )
-    session.commit()
+    try:
+        request = UserUnlockRequestService(session).approve_request(
+            request_id,
+        )
 
-    return request
+        session.commit()
 
+        return request
 
-# ADMIN REJECTS
+    except UnlockRequestNotFoundError:
+        raise HTTPException(
+            status_code=404,
+            detail="Unlock request not found.",
+        )
+    except AccountNotLockedError:
+        raise HTTPException(
+            status_code=409,
+            detail="Account is no longer locked.",
+        )
 
 
 @router.patch(
@@ -93,9 +109,17 @@ def reject_unlock_request(
     session: Session = Depends(get_db),
     _admin: User = Depends(require_admin),
 ):
-    request = UserUnlockRequestService(session).reject_request(
-        request_id,
-    )
-    session.commit()
+    try:
+        request = UserUnlockRequestService(session).reject_request(
+            request_id,
+        )
 
-    return request
+        session.commit()
+
+        return request
+
+    except UnlockRequestNotFoundError:
+        raise HTTPException(
+            status_code=404,
+            detail="Unlock request not found.",
+        )

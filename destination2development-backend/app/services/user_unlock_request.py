@@ -20,11 +20,22 @@ class UnlockRequestNotFoundError(Exception):
     pass
 
 
+class AccountNotLockedError(Exception):
+    pass
+
+
+class UnlockRequestNotFoundError(Exception):
+    pass
+
+
 class UserUnlockRequestService(CRUDService[UserUnlockRequest]):
     model = UserUnlockRequest
     not_found_error = UnlockRequestNotFoundError
 
     def create_request(self, user: User, message: str) -> UserUnlockRequest:
+        if user.account_status != AccountStatus.locked:
+            raise AccountNotLockedError()
+
         stmt = select(UserUnlockRequest).where(
             UserUnlockRequest.user_id == user.id,
             UserUnlockRequest.status == UnlockRequestStatus.pending,
@@ -52,8 +63,13 @@ class UserUnlockRequestService(CRUDService[UserUnlockRequest]):
 
     def approve_request(self, request_id: uuid.UUID) -> UserUnlockRequest:
         request = self.get_by_id_or_raise(request_id)
+
+        if request.user.account_status != AccountStatus.locked:
+            raise AccountNotLockedError()
+
         request.status = UnlockRequestStatus.approved
         request.user.account_status = AccountStatus.active
+
         return request
 
     def reject_request(self, request_id: uuid.UUID) -> UserUnlockRequest:

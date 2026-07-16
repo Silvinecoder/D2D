@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import httpx
+
 from dataclasses import dataclass
 from typing import Any
 
@@ -57,7 +59,15 @@ def get_current_user(
     of re-implementing the lookup, which is what let the unlock-requests
     router drift out of sync with UserService's real signature.
     """
-    auth0_user = auth0_management.get_user(identity.access_token)
+    try:
+        auth0_user = auth0_management.get_user(identity.access_token)
+    except httpx.HTTPStatusError as exc:
+        if exc.response.status_code in (401, 403):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid or expired token.",
+            )
+        raise
 
     service = UserService(session)
     return service.get_or_create_auth0_user(auth0_user)
