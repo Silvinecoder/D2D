@@ -18,7 +18,7 @@ from app.schemas.user_unlock_request import (
 from app.services.user_unlock_request import (
     AccountNotLockedError,
     UserUnlockRequestService,
-    UnlockRequestNotFoundError
+    UnlockRequestNotFoundError,
 )
 
 router = APIRouter(

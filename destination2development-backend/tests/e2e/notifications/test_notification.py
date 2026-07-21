@@ -3,18 +3,18 @@ from __future__ import annotations
 
 def test_recipient_is_notified_when_they_receive_a_message(
     client,
-    disposable_user,
+    student_user,
     admin_user,
 ):
     thread = client.post(
         "/message-threads",
-        headers={"Authorization": f"Bearer {disposable_user['access_token']}"},
+        headers={"Authorization": f"Bearer {student_user['access_token']}"},
         json={"message_type": "chat"},
     ).json()
 
     client.post(
         "/message-thread-participants",
-        headers={"Authorization": f"Bearer {disposable_user['access_token']}"},
+        headers={"Authorization": f"Bearer {student_user['access_token']}"},
         json={
             "thread_id": thread["id"],
             "user_id": str(admin_user["user_id"]),
@@ -24,7 +24,7 @@ def test_recipient_is_notified_when_they_receive_a_message(
 
     client.post(
         f"/message-threads/{thread['id']}/messages",
-        headers={"Authorization": f"Bearer {disposable_user['access_token']}"},
+        headers={"Authorization": f"Bearer {student_user['access_token']}"},
         json={
             "body": "Hello!",
         },
@@ -47,7 +47,7 @@ def test_recipient_is_notified_when_they_receive_a_message(
 
     sender_notifications = client.get(
         "/notifications",
-        headers={"Authorization": f"Bearer {disposable_user['access_token']}"},
+        headers={"Authorization": f"Bearer {student_user['access_token']}"},
     ).json()
 
     assert sender_notifications["unread_count"] == 0
@@ -60,18 +60,18 @@ def test_recipient_is_notified_when_they_receive_a_message(
 
 def test_can_mark_notification_as_read(
     client,
-    disposable_user,
+    student_user,
     admin_user,
 ):
     thread = client.post(
         "/message-threads",
-        headers={"Authorization": f"Bearer {disposable_user['access_token']}"},
+        headers={"Authorization": f"Bearer {student_user['access_token']}"},
         json={"message_type": "chat"},
     ).json()
 
     client.post(
         "/message-thread-participants",
-        headers={"Authorization": f"Bearer {disposable_user['access_token']}"},
+        headers={"Authorization": f"Bearer {student_user['access_token']}"},
         json={
             "thread_id": thread["id"],
             "user_id": str(admin_user["user_id"]),
@@ -81,7 +81,7 @@ def test_can_mark_notification_as_read(
 
     client.post(
         f"/message-threads/{thread['id']}/messages",
-        headers={"Authorization": f"Bearer {disposable_user['access_token']}"},
+        headers={"Authorization": f"Bearer {student_user['access_token']}"},
         json={
             "thread_id": thread["id"],
             "body": "Hello!",
@@ -116,18 +116,18 @@ def test_can_mark_notification_as_read(
 
 def test_user_cannot_mark_another_users_notification_as_read(
     client,
-    disposable_user,
+    student_user,
     admin_user,
 ):
     thread = client.post(
         "/message-threads",
-        headers={"Authorization": f"Bearer {disposable_user['access_token']}"},
+        headers={"Authorization": f"Bearer {student_user['access_token']}"},
         json={"message_type": "chat"},
     ).json()
 
     client.post(
         "/message-thread-participants",
-        headers={"Authorization": f"Bearer {disposable_user['access_token']}"},
+        headers={"Authorization": f"Bearer {student_user['access_token']}"},
         json={
             "thread_id": thread["id"],
             "user_id": str(admin_user["user_id"]),
@@ -137,7 +137,7 @@ def test_user_cannot_mark_another_users_notification_as_read(
 
     client.post(
         f"/message-threads/{thread['id']}/messages",
-        headers={"Authorization": f"Bearer {disposable_user['access_token']}"},
+        headers={"Authorization": f"Bearer {student_user['access_token']}"},
         json={
             "thread_id": thread["id"],
             "body": "Hello!",
@@ -153,7 +153,7 @@ def test_user_cannot_mark_another_users_notification_as_read(
 
     response = client.patch(
         f"/notifications/{notification['id']}/read",
-        headers={"Authorization": f"Bearer {disposable_user['access_token']}"},
+        headers={"Authorization": f"Bearer {student_user['access_token']}"},
     )
 
     assert response.status_code == 404

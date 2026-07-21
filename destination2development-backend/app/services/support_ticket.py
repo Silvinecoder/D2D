@@ -6,7 +6,6 @@ from sqlalchemy import select
 
 from app.core.events import publish
 from app.models.message_thread import MessageThreadType
-from app.models.message_thread_participant import ParticipantRole
 from app.models.support_ticket import (
     SupportTicket,
     TicketStatus,
@@ -177,7 +176,6 @@ class SupportTicketService(CRUDService[SupportTicket]):
         MessageThreadParticipantService(self.session).add_participant(
             thread_id=ticket.thread_id,
             user_id=admin.id,
-            role=ParticipantRole.support,
         )
 
         if ticket.status == TicketStatus.open:

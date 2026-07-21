@@ -3,12 +3,12 @@ from __future__ import annotations
 
 def test_create_profile(
     client,
-    disposable_user,
+    student_user,
 ):
     response = client.post(
         "/profile",
         headers={
-            "Authorization": f"Bearer {disposable_user['access_token']}",
+            "Authorization": f"Bearer {student_user['access_token']}",
         },
         json={
             "qualification": "BSc Computer Science",
@@ -23,7 +23,7 @@ def test_create_profile(
 
     data = response.json()
 
-    assert data["user_id"] == str(disposable_user["user_id"])
+    assert data["user_id"] == str(student_user["user_id"])
     assert data["qualification"] == "BSc Computer Science"
     assert data["date_of_birth"] == "1998-05-10"
     assert data["gender"] == "female"
@@ -34,12 +34,12 @@ def test_create_profile(
 
 def test_create_profile_twice_returns_conflict(
     client,
-    disposable_user,
+    student_user,
 ):
     response = client.post(
         "/profile",
         headers={
-            "Authorization": f"Bearer {disposable_user['access_token']}",
+            "Authorization": f"Bearer {student_user['access_token']}",
         },
         json={},
     )
@@ -49,7 +49,7 @@ def test_create_profile_twice_returns_conflict(
     response = client.post(
         "/profile",
         headers={
-            "Authorization": f"Bearer {disposable_user['access_token']}",
+            "Authorization": f"Bearer {student_user['access_token']}",
         },
         json={},
     )
@@ -59,12 +59,12 @@ def test_create_profile_twice_returns_conflict(
 
 def test_get_profile(
     client,
-    disposable_user,
+    student_user,
 ):
     client.post(
         "/profile",
         headers={
-            "Authorization": f"Bearer {disposable_user['access_token']}",
+            "Authorization": f"Bearer {student_user['access_token']}",
         },
         json={
             "city": "Manchester",
@@ -74,7 +74,7 @@ def test_get_profile(
     response = client.get(
         "/profile",
         headers={
-            "Authorization": f"Bearer {disposable_user['access_token']}",
+            "Authorization": f"Bearer {student_user['access_token']}",
         },
     )
 
@@ -83,17 +83,17 @@ def test_get_profile(
     data = response.json()
 
     assert data["city"] == "Manchester"
-    assert data["user_id"] == str(disposable_user["user_id"])
+    assert data["user_id"] == str(student_user["user_id"])
 
 
 def test_update_profile(
     client,
-    disposable_user,
+    student_user,
 ):
     client.post(
         "/profile",
         headers={
-            "Authorization": f"Bearer {disposable_user['access_token']}",
+            "Authorization": f"Bearer {student_user['access_token']}",
         },
         json={},
     )
@@ -101,7 +101,7 @@ def test_update_profile(
     response = client.patch(
         "/profile",
         headers={
-            "Authorization": f"Bearer {disposable_user['access_token']}",
+            "Authorization": f"Bearer {student_user['access_token']}",
         },
         json={
             "city": "Bristol",

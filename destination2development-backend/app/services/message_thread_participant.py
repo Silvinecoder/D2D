@@ -4,10 +4,7 @@ import uuid
 
 from sqlalchemy import select
 
-from app.models.message_thread_participant import (
-    MessageThreadParticipant,
-    ParticipantRole,
-)
+from app.models.message_thread_participant import MessageThreadParticipant
 from app.services.base import CRUDService
 
 from .message_thread import MessageThreadService
@@ -27,7 +24,6 @@ class MessageThreadParticipantService(CRUDService[MessageThreadParticipant]):
         *,
         thread_id: uuid.UUID,
         user_id: uuid.UUID,
-        role: ParticipantRole,
     ) -> MessageThreadParticipant:
 
         MessageThreadService(self.session).get_by_id_or_raise(thread_id)
@@ -46,7 +42,6 @@ class MessageThreadParticipantService(CRUDService[MessageThreadParticipant]):
         participant = MessageThreadParticipant(
             thread_id=thread_id,
             user_id=user_id,
-            role=role,
         )
 
         self.session.add(participant)

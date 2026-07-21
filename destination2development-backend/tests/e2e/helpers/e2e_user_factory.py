@@ -5,7 +5,7 @@ import uuid
 from fastapi.testclient import TestClient
 
 from app.core.database import SessionLocal
-from app.models.user import SystemRole
+from app.models.user import AccountType, SystemRole
 from app.services.user_auth0 import Auth0Service
 from app.services.user import UserService
 
@@ -18,6 +18,7 @@ def create_e2e_user(
     client: TestClient,
     *,
     role: SystemRole = SystemRole.user,
+    account_type: AccountType = AccountType.student,
 ):
     """Create a real Auth0 user and provision the local database user."""
 
@@ -54,6 +55,11 @@ def create_e2e_user(
             raise RuntimeError("Failed to provision local user.")
 
         service.set_role(user.id, role)
+
+        service.set_account_type(
+            user.id,
+            account_type,
+        )
 
         session.commit()
         session.refresh(user)
@@ -98,5 +104,6 @@ def create_e2e_user(
         "name": name,
         "access_token": access_token,
         "role": role,
+        "account_type": account_type,
         "cleanup": cleanup,
     }

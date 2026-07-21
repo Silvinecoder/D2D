@@ -18,6 +18,7 @@ from app.schemas.user import (
     UserPasswordUpdate,
     UserResponse,
     UserRoleUpdate,
+    UserAccountTypeUpdate,
 )
 from app.services.user_auth0 import Auth0Service
 from app.services.user import (
@@ -51,6 +52,33 @@ def get_current_user_details(
     session.commit()
 
     return user
+
+
+@router.patch(
+    "/current/account-type",
+    response_model=UserResponse,
+)
+def update_current_user_account_type(
+    data: UserAccountTypeUpdate,
+    user: User = Depends(get_current_active_user),
+    session: Session = Depends(get_db),
+):
+    try:
+        user = UserService(session).set_account_type(
+            user.id,
+            data.account_type,
+        )
+
+        session.commit()
+        session.refresh(user)
+
+        return user
+
+    except UserNotFoundError:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found.",
+        )
 
 
 @router.patch(

@@ -16,24 +16,8 @@ if TYPE_CHECKING:
     from .user import User
 
 
-class ParticipantRole(str, enum.Enum):
-    student = "student"
-    assessor = "assessor"
-    director = "director"
-    admin = "admin"
-    support = "support"
-
-
 class MessageThreadParticipant(Base, TimestampMixin):
     __tablename__ = "message_thread_participants"
-
-    __table_args__ = (
-        UniqueConstraint(
-            "thread_id",
-            "user_id",
-            name="uq_message_thread_participant",
-        ),
-    )
 
     id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
@@ -49,20 +33,12 @@ class MessageThreadParticipant(Base, TimestampMixin):
         nullable=False,
     )
 
-    user_id: Mapped[uuid.UUID] = mapped_column(
+    user_id: Mapped[uuid.UUID | None] = mapped_column(
         ForeignKey(
             "users.id",
-            ondelete="CASCADE",
+            ondelete="SET NULL",
         ),
-        nullable=False,
-    )
-
-    role: Mapped[ParticipantRole] = mapped_column(
-        Enum(
-            ParticipantRole,
-            name="participant_role",
-        ),
-        nullable=False,
+        nullable=True,
     )
 
     joined_at: Mapped[datetime] = mapped_column(

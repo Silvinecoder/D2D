@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 from app.models.user import (
     AccountStatus,
     SystemRole,
+    AccountType,
     User,
 )
 from app.schemas.user_auth0 import Auth0User
@@ -88,6 +89,7 @@ class UserService(CRUDService[User]):
             name=auth0_user.name,
             account_status=AccountStatus.active,
             system_role=SystemRole.user,
+            account_type=None,
             last_login_at=utcnow(),
         )
 
@@ -95,6 +97,16 @@ class UserService(CRUDService[User]):
         self.session.flush()
 
         return user
+
+    def set_account_type(
+        self,
+        user_id: uuid.UUID,
+        account_type: AccountType,
+    ) -> User:
+        return self._update_user(
+            user_id,
+            account_type=account_type,
+        )
 
     # -------------------
     # Profile updates

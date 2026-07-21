@@ -5,6 +5,7 @@ import uuid
 from sqlalchemy import select
 
 from app.models.message_thread import MessageThread, MessageThreadType
+from app.models.message_thread_participant import MessageThreadParticipant
 from app.models.user import User
 from app.services.base import CRUDService, utcnow
 
@@ -34,6 +35,15 @@ class MessageThreadService(CRUDService[MessageThread]):
         self.session.add(thread)
         self.session.flush()
 
+        # The creator is automatically the first participant.
+        participant = MessageThreadParticipant(
+            thread_id=thread.id,
+            user_id=creator.id,
+        )
+
+        self.session.add(participant)
+        self.session.flush()
+
         return thread
 
     def list_threads(self):
@@ -43,7 +53,11 @@ class MessageThreadService(CRUDService[MessageThread]):
 
         return list(self.session.scalars(stmt))
 
-    def update_last_message(self, thread_id: uuid.UUID):
+    def update_last_message(
+        self,
+        thread_id: uuid.UUID,
+    ):
         thread = self.get_by_id_or_raise(thread_id)
         thread.last_message_at = utcnow()
+
         return thread

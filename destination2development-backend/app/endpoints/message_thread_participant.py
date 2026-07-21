@@ -35,7 +35,6 @@ def add_message_thread_participant(
     participant = service.add_participant(
         thread_id=request.thread_id,
         user_id=request.user_id,
-        role=request.role,
     )
 
     session.commit()

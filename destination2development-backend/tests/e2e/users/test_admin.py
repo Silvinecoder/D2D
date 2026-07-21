@@ -17,8 +17,8 @@ def test_get_all_users_admin(client, admin_user):
     assert any(user["email"] == admin_user["email"] for user in users)
 
 
-def test_get_user_admin(client, admin_user, disposable_user):
-    target_user_id = disposable_user["user_id"]
+def test_get_user_admin(client, admin_user, student_user):
+    target_user_id = student_user["user_id"]
 
     response = client.get(
         f"/users/admin/{target_user_id}",
@@ -32,11 +32,11 @@ def test_get_user_admin(client, admin_user, disposable_user):
     user = response.json()
 
     assert user["id"] == str(target_user_id)
-    assert user["email"] == disposable_user["email"]
+    assert user["email"] == student_user["email"]
 
 
-def test_update_user_role_admin(client, admin_user, disposable_user):
-    target_user_id = disposable_user["user_id"]
+def test_update_user_role_admin(client, admin_user, student_user):
+    target_user_id = student_user["user_id"]
 
     response = client.patch(
         f"/users/admin/{target_user_id}/role",
@@ -55,8 +55,8 @@ def test_update_user_role_admin(client, admin_user, disposable_user):
     assert user["system_role"] == "admin"
 
 
-def test_lock_user_admin(client, admin_user, disposable_user):
-    target_user_id = disposable_user["user_id"]
+def test_lock_user_admin(client, admin_user, student_user):
+    target_user_id = student_user["user_id"]
 
     response = client.patch(
         f"/users/admin/{target_user_id}/lock",
@@ -72,14 +72,14 @@ def test_lock_user_admin(client, admin_user, disposable_user):
     assert user["account_status"] == "locked"
 
 
-def test_restore_user_admin(client, admin_user, disposable_user):
-    target_user_id = disposable_user["user_id"]
+def test_restore_user_admin(client, admin_user, student_user):
+    target_user_id = student_user["user_id"]
 
     # User deactivates their own account first.
     response = client.delete(
         "/users/current",
         headers={
-            "Authorization": f"Bearer {disposable_user['access_token']}",
+            "Authorization": f"Bearer {student_user['access_token']}",
         },
     )
 
@@ -101,8 +101,8 @@ def test_restore_user_admin(client, admin_user, disposable_user):
     assert user["deactivated_at"] is None
 
 
-def test_delete_user_admin(client, admin_user, disposable_user):
-    target_user_id = disposable_user["user_id"]
+def test_delete_user_admin(client, admin_user, student_user):
+    target_user_id = student_user["user_id"]
 
     response = client.delete(
         f"/users/admin/{target_user_id}",
@@ -123,11 +123,11 @@ def test_delete_user_admin(client, admin_user, disposable_user):
     assert response.status_code == 404
 
 
-def test_admin_forbidden_for_regular_user(client, disposable_user):
+def test_admin_forbidden_for_regular_user(client, student_user):
     response = client.get(
         "/users/admin",
         headers={
-            "Authorization": f"Bearer {disposable_user['access_token']}",
+            "Authorization": f"Bearer {student_user['access_token']}",
         },
     )
 
@@ -154,8 +154,11 @@ def test_admin_can_delete_own_account(client, admin_user):
 
     assert response.status_code in (401, 404)
 
-def test_restore_user_admin_conflict_if_not_deactivated(client, admin_user, disposable_user):
-    target_user_id = disposable_user["user_id"]
+
+def test_restore_user_admin_conflict_if_not_deactivated(
+    client, admin_user, student_user
+):
+    target_user_id = student_user["user_id"]
 
     # User is active, never deactivated — restore should be rejected.
     response = client.patch(

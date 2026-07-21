@@ -3,12 +3,12 @@ from __future__ import annotations
 
 def test_add_profile_language(
     client,
-    disposable_user,
+    student_user,
 ):
     client.post(
         "/profile",
         headers={
-            "Authorization": f"Bearer {disposable_user['access_token']}",
+            "Authorization": f"Bearer {student_user['access_token']}",
         },
         json={},
     )
@@ -20,7 +20,7 @@ def test_add_profile_language(
     response = client.post(
         "/profile/languages",
         headers={
-            "Authorization": f"Bearer {disposable_user['access_token']}",
+            "Authorization": f"Bearer {student_user['access_token']}",
         },
         json={
             "language_id": english["id"],
@@ -38,12 +38,12 @@ def test_add_profile_language(
 
 def test_get_profile_languages(
     client,
-    disposable_user,
+    student_user,
 ):
     client.post(
         "/profile",
         headers={
-            "Authorization": f"Bearer {disposable_user['access_token']}",
+            "Authorization": f"Bearer {student_user['access_token']}",
         },
         json={},
     )
@@ -55,7 +55,7 @@ def test_get_profile_languages(
     client.post(
         "/profile/languages",
         headers={
-            "Authorization": f"Bearer {disposable_user['access_token']}",
+            "Authorization": f"Bearer {student_user['access_token']}",
         },
         json={
             "language_id": english["id"],
@@ -66,7 +66,7 @@ def test_get_profile_languages(
     response = client.get(
         "/profile/languages",
         headers={
-            "Authorization": f"Bearer {disposable_user['access_token']}",
+            "Authorization": f"Bearer {student_user['access_token']}",
         },
     )
 
@@ -80,12 +80,12 @@ def test_get_profile_languages(
 
 def test_remove_profile_language(
     client,
-    disposable_user,
+    student_user,
 ):
     client.post(
         "/profile",
         headers={
-            "Authorization": f"Bearer {disposable_user['access_token']}",
+            "Authorization": f"Bearer {student_user['access_token']}",
         },
         json={},
     )
@@ -97,7 +97,7 @@ def test_remove_profile_language(
     client.post(
         "/profile/languages",
         headers={
-            "Authorization": f"Bearer {disposable_user['access_token']}",
+            "Authorization": f"Bearer {student_user['access_token']}",
         },
         json={
             "language_id": english["id"],
@@ -109,7 +109,7 @@ def test_remove_profile_language(
         "DELETE",
         "/profile/languages",
         headers={
-            "Authorization": f"Bearer {disposable_user['access_token']}",
+            "Authorization": f"Bearer {student_user['access_token']}",
         },
         json={
             "language_id": english["id"],
@@ -122,7 +122,7 @@ def test_remove_profile_language(
     response = client.get(
         "/profile/languages",
         headers={
-            "Authorization": f"Bearer {disposable_user['access_token']}",
+            "Authorization": f"Bearer {student_user['access_token']}",
         },
     )
 
@@ -131,7 +131,7 @@ def test_remove_profile_language(
 
 def test_cannot_add_language_without_profile(
     client,
-    disposable_user,
+    student_user,
 ):
     languages = client.get("/languages").json()
 
@@ -140,7 +140,7 @@ def test_cannot_add_language_without_profile(
     response = client.post(
         "/profile/languages",
         headers={
-            "Authorization": f"Bearer {disposable_user['access_token']}",
+            "Authorization": f"Bearer {student_user['access_token']}",
         },
         json={
             "language_id": english["id"],
