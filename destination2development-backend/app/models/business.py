@@ -23,16 +23,7 @@ class Business(Base, TimestampMixin):
         default=uuid.uuid4,
     )
 
-    user_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("users.id", ondelete="CASCADE"),
-        nullable=False,
-        unique=True,
-    )
-
-    name: Mapped[str] = mapped_column(
-        String(100),
-        nullable=False,
-    )
+    name: Mapped[str] = mapped_column(String(100), nullable=False)
 
     slug: Mapped[str] = mapped_column(
         String(100),
@@ -45,9 +36,10 @@ class Business(Base, TimestampMixin):
         nullable=True,
     )
 
-    user: Mapped["User"] = relationship(
-        "User",
+    users: Mapped[list["BusinessUser"]] = relationship(
+        "BusinessUser",
         back_populates="business",
+        cascade="all, delete-orphan",
     )
 
     courses: Mapped[list["Course"]] = relationship(
@@ -55,3 +47,4 @@ class Business(Base, TimestampMixin):
         back_populates="business",
         cascade="all, delete-orphan",
     )
+    
