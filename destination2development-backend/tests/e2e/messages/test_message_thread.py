@@ -3,12 +3,12 @@ from __future__ import annotations
 
 def test_create_message_thread(
     client,
-    disposable_user,
+    student_user,
 ):
     response = client.post(
         "/message-threads",
         headers={
-            "Authorization": f"Bearer {disposable_user['access_token']}",
+            "Authorization": f"Bearer {student_user['access_token']}",
         },
         json={
             "message_type": "chat",
@@ -22,17 +22,17 @@ def test_create_message_thread(
 
     assert thread["message_type"] == "chat"
     assert thread["subject"] == "General Chat"
-    assert thread["created_by"] == str(disposable_user["user_id"])
+    assert thread["created_by"] == str(student_user["user_id"])
 
 
 def test_list_message_threads(
     client,
-    disposable_user,
+    student_user,
 ):
     client.post(
         "/message-threads",
         headers={
-            "Authorization": f"Bearer {disposable_user['access_token']}",
+            "Authorization": f"Bearer {student_user['access_token']}",
         },
         json={
             "message_type": "chat",
@@ -43,7 +43,7 @@ def test_list_message_threads(
     response = client.get(
         "/message-threads",
         headers={
-            "Authorization": f"Bearer {disposable_user['access_token']}",
+            "Authorization": f"Bearer {student_user['access_token']}",
         },
     )
 

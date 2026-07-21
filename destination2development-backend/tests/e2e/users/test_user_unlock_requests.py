@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 
-def test_create_unlock_request(client, admin_user, disposable_user):
+def test_create_unlock_request(client, admin_user, student_user):
     response = client.patch(
-        f"/users/admin/{disposable_user['user_id']}/lock",
+        f"/users/admin/{student_user['user_id']}/lock",
         headers={
             "Authorization": f"Bearer {admin_user['access_token']}",
         },
@@ -14,7 +14,7 @@ def test_create_unlock_request(client, admin_user, disposable_user):
     response = client.post(
         "/unlock-requests",
         headers={
-            "Authorization": f"Bearer {disposable_user['access_token']}",
+            "Authorization": f"Bearer {student_user['access_token']}",
         },
         json={
             "message": "Please unlock my account.",
@@ -25,7 +25,7 @@ def test_create_unlock_request(client, admin_user, disposable_user):
 
     request = response.json()
 
-    assert request["user_id"] == str(disposable_user["user_id"])
+    assert request["user_id"] == str(student_user["user_id"])
     assert request["message"] == "Please unlock my account."
     assert request["status"] == "pending"
 
@@ -33,10 +33,10 @@ def test_create_unlock_request(client, admin_user, disposable_user):
 def test_create_unlock_request_returns_existing_pending_request(
     client,
     admin_user,
-    disposable_user,
+    student_user,
 ):
     response = client.patch(
-        f"/users/admin/{disposable_user['user_id']}/lock",
+        f"/users/admin/{student_user['user_id']}/lock",
         headers={
             "Authorization": f"Bearer {admin_user['access_token']}",
         },
@@ -47,7 +47,7 @@ def test_create_unlock_request_returns_existing_pending_request(
     first = client.post(
         "/unlock-requests",
         headers={
-            "Authorization": f"Bearer {disposable_user['access_token']}",
+            "Authorization": f"Bearer {student_user['access_token']}",
         },
         json={
             "message": "First request",
@@ -57,7 +57,7 @@ def test_create_unlock_request_returns_existing_pending_request(
     second = client.post(
         "/unlock-requests",
         headers={
-            "Authorization": f"Bearer {disposable_user['access_token']}",
+            "Authorization": f"Bearer {student_user['access_token']}",
         },
         json={
             "message": "Second request",
@@ -74,10 +74,10 @@ def test_create_unlock_request_returns_existing_pending_request(
 def test_list_unlock_requests_admin(
     client,
     admin_user,
-    disposable_user,
+    student_user,
 ):
     response = client.patch(
-        f"/users/admin/{disposable_user['user_id']}/lock",
+        f"/users/admin/{student_user['user_id']}/lock",
         headers={
             "Authorization": f"Bearer {admin_user['access_token']}",
         },
@@ -88,7 +88,7 @@ def test_list_unlock_requests_admin(
     response = client.post(
         "/unlock-requests",
         headers={
-            "Authorization": f"Bearer {disposable_user['access_token']}",
+            "Authorization": f"Bearer {student_user['access_token']}",
         },
         json={
             "message": "Please unlock me.",
@@ -111,17 +111,17 @@ def test_list_unlock_requests_admin(
     assert isinstance(requests, list)
 
     assert any(
-        request["user_id"] == str(disposable_user["user_id"]) for request in requests
+        request["user_id"] == str(student_user["user_id"]) for request in requests
     )
 
 
 def test_approve_unlock_request(
     client,
     admin_user,
-    disposable_user,
+    student_user,
 ):
     response = client.patch(
-        f"/users/admin/{disposable_user['user_id']}/lock",
+        f"/users/admin/{student_user['user_id']}/lock",
         headers={
             "Authorization": f"Bearer {admin_user['access_token']}",
         },
@@ -132,7 +132,7 @@ def test_approve_unlock_request(
     response = client.post(
         "/unlock-requests",
         headers={
-            "Authorization": f"Bearer {disposable_user['access_token']}",
+            "Authorization": f"Bearer {student_user['access_token']}",
         },
         json={
             "message": "Please unlock me.",
@@ -157,7 +157,7 @@ def test_approve_unlock_request(
     assert request["status"] == "approved"
 
     response = client.get(
-        f"/users/admin/{disposable_user['user_id']}",
+        f"/users/admin/{student_user['user_id']}",
         headers={
             "Authorization": f"Bearer {admin_user['access_token']}",
         },
@@ -173,10 +173,10 @@ def test_approve_unlock_request(
 def test_reject_unlock_request(
     client,
     admin_user,
-    disposable_user,
+    student_user,
 ):
     response = client.patch(
-        f"/users/admin/{disposable_user['user_id']}/lock",
+        f"/users/admin/{student_user['user_id']}/lock",
         headers={
             "Authorization": f"Bearer {admin_user['access_token']}",
         },
@@ -187,7 +187,7 @@ def test_reject_unlock_request(
     response = client.post(
         "/unlock-requests",
         headers={
-            "Authorization": f"Bearer {disposable_user['access_token']}",
+            "Authorization": f"Bearer {student_user['access_token']}",
         },
         json={
             "message": "Please unlock me.",
@@ -214,23 +214,23 @@ def test_reject_unlock_request(
 
 def test_unlock_request_admin_forbidden_for_regular_user(
     client,
-    disposable_user,
+    student_user,
 ):
     response = client.get(
         "/unlock-requests/admin",
         headers={
-            "Authorization": f"Bearer {disposable_user['access_token']}",
+            "Authorization": f"Bearer {student_user['access_token']}",
         },
     )
 
     assert response.status_code in (401, 403)
 
 
-def test_create_unlock_request_conflict_if_not_locked(client, disposable_user):
+def test_create_unlock_request_conflict_if_not_locked(client, student_user):
     response = client.post(
         "/unlock-requests",
         headers={
-            "Authorization": f"Bearer {disposable_user['access_token']}",
+            "Authorization": f"Bearer {student_user['access_token']}",
         },
         json={
             "message": "Please unlock my account.",
@@ -243,10 +243,10 @@ def test_create_unlock_request_conflict_if_not_locked(client, disposable_user):
 def test_approve_unlock_request_conflict_if_already_approved(
     client,
     admin_user,
-    disposable_user,
+    student_user,
 ):
     response = client.patch(
-        f"/users/admin/{disposable_user['user_id']}/lock",
+        f"/users/admin/{student_user['user_id']}/lock",
         headers={
             "Authorization": f"Bearer {admin_user['access_token']}",
         },
@@ -257,7 +257,7 @@ def test_approve_unlock_request_conflict_if_already_approved(
     response = client.post(
         "/unlock-requests",
         headers={
-            "Authorization": f"Bearer {disposable_user['access_token']}",
+            "Authorization": f"Bearer {student_user['access_token']}",
         },
         json={
             "message": "Please unlock me.",

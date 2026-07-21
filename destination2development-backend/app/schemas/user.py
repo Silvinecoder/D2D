@@ -8,6 +8,7 @@ from pydantic import BaseModel, EmailStr
 from app.models.user import (
     AccountStatus,
     SystemRole,
+    AccountType,
 )
 
 
@@ -17,12 +18,17 @@ class UserResponse(BaseModel):
     name: str
     account_status: AccountStatus
     system_role: SystemRole
+    account_type: AccountType | None = None
     last_login_at: datetime | None = None
     deactivated_at: datetime | None = None
 
     model_config = {
         "from_attributes": True,
     }
+
+
+class UserAccountTypeUpdate(BaseModel):
+    account_type: AccountType
 
 
 class UserNameUpdate(BaseModel):

@@ -1,8 +1,8 @@
 """migration description
 
-Revision ID: 0bcc5f637a7c
+Revision ID: 7c5064d03270
 Revises:
-Create Date: 2026-07-15 16:26:30.015346
+Create Date: 2026-07-16 21:46:27.381279
 
 """
 
@@ -13,7 +13,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = "0bcc5f637a7c"
+revision: str = "7c5064d03270"
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -45,7 +45,7 @@ def upgrade() -> None:
     op.create_table(
         "users",
         sa.Column("id", sa.UUID(), nullable=False),
-        sa.Column("auth0_id", sa.String(length=100), nullable=True),
+        sa.Column("auth0_id", sa.String(length=100), nullable=False),
         sa.Column("email", sa.String(length=100), nullable=False),
         sa.Column("name", sa.String(length=100), nullable=False),
         sa.Column(
@@ -62,14 +62,13 @@ def upgrade() -> None:
         sa.Column(
             "system_role", sa.Enum("admin", "user", name="system_role"), nullable=False
         ),
-        sa.Column("last_login_at", sa.DateTime(timezone=True), nullable=True),
-        sa.Column("deactivated_at", sa.DateTime(timezone=True), nullable=True),
-        sa.Column("deleted_at", sa.DateTime(timezone=True), nullable=True),
         sa.Column(
-            "deletion_type",
-            sa.Enum("user_requested", "admin_requested", name="deletion_type"),
+            "account_type",
+            sa.Enum("business", "student", "assessor", name="account_type"),
             nullable=True,
         ),
+        sa.Column("last_login_at", sa.DateTime(timezone=True), nullable=True),
+        sa.Column("deactivated_at", sa.DateTime(timezone=True), nullable=True),
         sa.Column(
             "created_at",
             sa.DateTime(timezone=True),
@@ -280,12 +279,7 @@ def upgrade() -> None:
         "message_thread_participants",
         sa.Column("id", sa.UUID(), nullable=False),
         sa.Column("thread_id", sa.UUID(), nullable=False),
-        sa.Column("user_id", sa.UUID(), nullable=False),
-        sa.Column(
-            "role",
-            sa.Enum("student", "assessor", "admin", "support", name="participant_role"),
-            nullable=False,
-        ),
+        sa.Column("user_id", sa.UUID(), nullable=True),
         sa.Column(
             "joined_at",
             sa.DateTime(timezone=True),
@@ -307,11 +301,8 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(
             ["thread_id"], ["message_threads.id"], ondelete="CASCADE"
         ),
-        sa.ForeignKeyConstraint(["user_id"], ["users.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["user_id"], ["users.id"], ondelete="SET NULL"),
         sa.PrimaryKeyConstraint("id"),
-        sa.UniqueConstraint(
-            "thread_id", "user_id", name="uq_message_thread_participant"
-        ),
     )
     op.create_table(
         "messages",
