@@ -98,6 +98,12 @@ class User(Base, TimestampMixin):
         nullable=True,
     )
 
+    businesses: Mapped[list["BusinessUser"]] = relationship(
+        "BusinessUser",
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
+
     profile: Mapped["Profile | None"] = relationship(
         "Profile",
         back_populates="user",
