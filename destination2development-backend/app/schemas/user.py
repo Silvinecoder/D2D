@@ -3,13 +3,14 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, model_validator
 
 from app.models.user import (
     AccountStatus,
     SystemRole,
     AccountType,
 )
+from app.models.business import BusinessRole
 
 
 class UserResponse(BaseModel):
@@ -19,6 +20,8 @@ class UserResponse(BaseModel):
     account_status: AccountStatus
     system_role: SystemRole
     account_type: AccountType | None = None
+    business_id: uuid.UUID | None = None
+    business_role: BusinessRole | None = None
     last_login_at: datetime | None = None
     deactivated_at: datetime | None = None
 
@@ -28,7 +31,22 @@ class UserResponse(BaseModel):
 
 
 class UserAccountTypeUpdate(BaseModel):
+    """Self-service account type update — student/assessor only.
+    Business accounts are assigned separately via the admin business-assignment endpoint,
+    since they require a real business_id and role to attach to.
+    """
     account_type: AccountType
+
+
+class UserBusinessAssignmentUpdate(BaseModel):
+    """Admin-only: assign a user to a business with a role."""
+    business_id: uuid.UUID
+    business_role: BusinessRole
+
+
+class UserBusinessRoleUpdate(BaseModel):
+    """Admin-only: change an existing business user's role."""
+    business_role: BusinessRole
 
 
 class UserNameUpdate(BaseModel):

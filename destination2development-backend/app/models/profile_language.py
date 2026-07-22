@@ -33,7 +33,7 @@ class ProfileLanguage(Base, TimestampMixin):
         primary_key=True,
     )
 
-    type: Mapped[LanguageType] = mapped_column(
+    profile_language_type: Mapped[LanguageType] = mapped_column(
         Enum(LanguageType, name="language_type"),
         nullable=False,
     )

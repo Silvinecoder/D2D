@@ -34,6 +34,7 @@ class AccountStatus(str, enum.Enum):
     locked = "locked"
     pending_verification = "pending_verification"
     deactivated = "deactivated"
+    pending_business_approval = "pending_business_approval"
 
 
 class SystemRole(str, enum.Enum):

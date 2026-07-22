@@ -19,12 +19,17 @@ from app.schemas.user import (
     UserResponse,
     UserRoleUpdate,
     UserAccountTypeUpdate,
+    UserBusinessAssignmentUpdate,
+    UserBusinessRoleUpdate,
 )
 from app.services.user_auth0 import Auth0Service
 from app.services.user import (
     AccountNotDeactivatedError,
+    BusinessNotFoundError,
+    BusinessRoleRequiredError,
     UserNotFoundError,
     UserService,
+    AccountTypeAlreadySetError,
 )
 from app.services.account_deletion import AccountDeletionService
 
@@ -75,9 +80,12 @@ def update_current_user_account_type(
         return user
 
     except UserNotFoundError:
+        raise HTTPException(status_code=404, detail="User not found.")
+
+    except AccountTypeAlreadySetError:
         raise HTTPException(
-            status_code=404,
-            detail="User not found.",
+            status_code=409,
+            detail="Account type has already been selected.",
         )
 
 
@@ -309,3 +317,60 @@ def delete_user(
             status_code=404,
             detail="User not found.",
         )
+
+@router.patch(
+    "/admin/{user_id}/business",
+    response_model=UserResponse,
+)
+def assign_user_to_business(
+    user_id: uuid.UUID,
+    data: UserBusinessAssignmentUpdate,
+    session: Session = Depends(get_db),
+    _admin: User = Depends(require_admin),
+):
+    try:
+        user = UserService(session).set_account_type(
+            user_id,
+            AccountType.business,
+            business_id=data.business_id,
+            business_role=data.business_role,
+        )
+
+        session.commit()
+        session.refresh(user)
+
+        return user
+
+    except UserNotFoundError:
+        raise HTTPException(status_code=404, detail="User not found.")
+    except BusinessNotFoundError:
+        raise HTTPException(status_code=404, detail="Business not found.")
+    except BusinessRoleRequiredError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.patch(
+    "/admin/{user_id}/business/role",
+    response_model=UserResponse,
+)
+def update_user_business_role(
+    user_id: uuid.UUID,
+    data: UserBusinessRoleUpdate,
+    session: Session = Depends(get_db),
+    _admin: User = Depends(require_admin),
+):
+    try:
+        user = UserService(session).change_business_role(
+            user_id,
+            data.business_role,
+        )
+
+        session.commit()
+        session.refresh(user)
+
+        return user
+
+    except UserNotFoundError:
+        raise HTTPException(status_code=404, detail="User not found.")
+    except BusinessRoleRequiredError as e:
+        raise HTTPException(status_code=400, detail=str(e))
