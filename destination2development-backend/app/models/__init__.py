@@ -5,6 +5,16 @@ from .profile_language import ProfileLanguage
 from .profile_document import ProfileDocument
 from .document_access_request import DocumentAccessRequest
 from .user_unlock_request import UserUnlockRequest
+from .business import Business
+from .course_enrollment import CourseEnrollment
+from .course_enrollment_progress import CourseEnrollmentProgress
+from .course import Course
+from .course_language import CourseLanguage
+from .course_module import CourseModule
+from .course_price import CoursePrice
+from .course_unit import CourseUnit
+from .course_unit_progress import CourseUnitProgress
+from .course_unit_asset import CourseUnitAsset
 from .message import Message
 from .message_thread_participant import MessageThreadParticipant
 from .message_thread import MessageThread

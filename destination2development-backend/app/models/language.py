@@ -33,7 +33,7 @@ class Language(Base, TimestampMixin):
         nullable=False,
     )
 
-    courses: Mapped[list["CourseLanguage"]] = relationship(
+    course_languages: Mapped[list["CourseLanguage"]] = relationship(
         "CourseLanguage",
         back_populates="language",
         cascade="all, delete-orphan",

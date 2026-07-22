@@ -22,7 +22,6 @@ from app.helpers.model import Base, TimestampMixin
 
 if TYPE_CHECKING:
     from .business import Business
-    from .category import Category
     from .course_enrollment import CourseEnrollment
     from .course_price import CoursePrice
     from .user import User
@@ -47,11 +46,6 @@ class Course(Base, TimestampMixin):
 
     business_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("businesses.id", ondelete="CASCADE"),
-        nullable=False,
-    )
-
-    category_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("course_categories.id", ondelete="RESTRICT"),
         nullable=False,
     )
 
@@ -116,16 +110,12 @@ class Course(Base, TimestampMixin):
         back_populates="courses",
     )
 
-    category: Mapped["Category"] = relationship(
-        "Category",
-        back_populates="courses",
-    )
-
-    languages: Mapped[list["CourseLanguage"]] = relationship(
+    course_languages: Mapped[list["CourseLanguage"]] = relationship(
         "CourseLanguage",
         back_populates="course",
         cascade="all, delete-orphan",
     )
+
     creator: Mapped["User"] = relationship(
         "User",
         back_populates="created_courses",

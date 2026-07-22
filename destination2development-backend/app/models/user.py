@@ -11,9 +11,14 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.helpers.model import Base, TimestampMixin
 
+from app.models.business import BusinessRole
+
 
 if TYPE_CHECKING:
+    from .business import Business
     from .document_access_request import DocumentAccessRequest
+    from .course import Course
+    from .course_enrollment import CourseEnrollment
     from .profile import Profile
     from .profile_document import ProfileDocument
     from .user_unlock_request import UserUnlockRequest
@@ -98,8 +103,28 @@ class User(Base, TimestampMixin):
         nullable=True,
     )
 
-    businesses: Mapped[list["BusinessUser"]] = relationship(
-        "BusinessUser",
+    business_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("businesses.id", ondelete="CASCADE"),
+        nullable=True,
+    )
+
+    business_role: Mapped[BusinessRole | None] = mapped_column(
+        Enum(BusinessRole, name="business_role"),
+        nullable=True,
+    )
+
+    business: Mapped["Business | None"] = relationship(
+        "Business",
+        back_populates="users",
+    )
+
+    created_courses: Mapped[list["Course"]] = relationship(
+        "Course",
+        back_populates="creator",
+    )
+
+    course_enrollments: Mapped[list["CourseEnrollment"]] = relationship(
+        "CourseEnrollment",
         back_populates="user",
         cascade="all, delete-orphan",
     )
